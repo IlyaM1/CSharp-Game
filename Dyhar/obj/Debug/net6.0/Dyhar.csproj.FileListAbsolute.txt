@@ -23,3 +23,5 @@ D:\Programming\CSharp-Game\Dyhar\obj\Debug\net6.0\refint\Dyhar.dll
 D:\Programming\CSharp-Game\Dyhar\obj\Debug\net6.0\Dyhar.pdb
 D:\Programming\CSharp-Game\Dyhar\obj\Debug\net6.0\Dyhar.genruntimeconfig.cache
 D:\Programming\CSharp-Game\Dyhar\obj\Debug\net6.0\ref\Dyhar.dll
+D:\Programming\CSharp-Game\Dyhar\bin\Debug\net6.0\Content\player.xnb
+D:\Programming\CSharp-Game\Dyhar\bin\Debug\net6.0\Content\galleryFont.xnb

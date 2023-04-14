@@ -4,12 +4,20 @@ using Microsoft.Xna.Framework.Input;
 
 namespace Dyhar
 {
-    public class Game1 : Game
+    public class Dyhar : Game
     {
         private GraphicsDeviceManager _graphics;
         private SpriteBatch _spriteBatch;
 
-        public Game1()
+
+        Texture2D playerSprite;
+        SpriteFont standardFont;
+
+        Vector2 playerPosition = new Vector2(300, 300);
+
+        MouseState mouseState;
+
+        public Dyhar()
         {
             _graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
@@ -27,7 +35,8 @@ namespace Dyhar
         {
             _spriteBatch = new SpriteBatch(GraphicsDevice);
 
-            // TODO: use this.Content to load your game content here
+            playerSprite = Content.Load<Texture2D>("player");
+            standardFont = Content.Load<SpriteFont>("galleryFont");
         }
 
         protected override void Update(GameTime gameTime)
@@ -35,7 +44,9 @@ namespace Dyhar
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
 
-            // TODO: Add your update logic here
+            var currentMouseState = Mouse.GetState();
+            playerPosition.X = currentMouseState.X;
+            playerPosition.Y = currentMouseState.Y;
 
             base.Update(gameTime);
         }
@@ -44,7 +55,10 @@ namespace Dyhar
         {
             GraphicsDevice.Clear(Color.CornflowerBlue);
 
-            // TODO: Add your drawing code here
+            _spriteBatch.Begin();
+            _spriteBatch.Draw(playerSprite, playerPosition, Color.White);
+            _spriteBatch.DrawString(standardFont, "Test text.", new Vector2(100, 100), Color.White);
+            _spriteBatch.End();
 
             base.Draw(gameTime);
         }
