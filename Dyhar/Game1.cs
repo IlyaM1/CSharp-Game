@@ -1,6 +1,8 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using Dyhar.src.Entities;
+using Dyhar.src.Control;
 
 namespace Dyhar
 {
@@ -8,14 +10,10 @@ namespace Dyhar
     {
         private GraphicsDeviceManager _graphics;
         private SpriteBatch _spriteBatch;
-
-
-        Texture2D playerSprite;
         SpriteFont standardFont;
 
-        Vector2 playerPosition = new Vector2(300, 300);
-
-        MouseState mouseState;
+        Player player;
+        Control control = new Control(ControlState.Game);
 
         public Dyhar()
         {
@@ -27,6 +25,8 @@ namespace Dyhar
         protected override void Initialize()
         {
             // TODO: Add your initialization logic here
+            player = new Player(150, 150);
+            control.SetPlayer(player);
 
             base.Initialize();
         }
@@ -35,7 +35,7 @@ namespace Dyhar
         {
             _spriteBatch = new SpriteBatch(GraphicsDevice);
 
-            playerSprite = Content.Load<Texture2D>("player");
+            Player.sprite = Content.Load<Texture2D>("player");
             standardFont = Content.Load<SpriteFont>("galleryFont");
         }
 
@@ -45,8 +45,8 @@ namespace Dyhar
                 Exit();
 
             var currentMouseState = Mouse.GetState();
-            playerPosition.X = currentMouseState.X;
-            playerPosition.Y = currentMouseState.Y;
+            var currentKeyboardState = Keyboard.GetState();
+            control.onUpdate(currentMouseState, currentKeyboardState);
 
             base.Update(gameTime);
         }
@@ -56,7 +56,7 @@ namespace Dyhar
             GraphicsDevice.Clear(Color.CornflowerBlue);
 
             _spriteBatch.Begin();
-            _spriteBatch.Draw(playerSprite, playerPosition, Color.White);
+            _spriteBatch.Draw(Player.sprite, player.Position, Color.White);
             _spriteBatch.DrawString(standardFont, "Test text.", new Vector2(100, 100), Color.White);
             _spriteBatch.End();
 
