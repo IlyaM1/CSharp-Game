@@ -24,7 +24,6 @@ namespace Dyhar
 
         protected override void Initialize()
         {
-            // TODO: Add your initialization logic here
             player = new Player(150, 150);
             control.SetPlayer(player);
 
