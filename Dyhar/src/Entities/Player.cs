@@ -13,10 +13,8 @@ namespace Dyhar.src.Entities
     {
         public static Texture2D sprite;
 
-        public double X {  get; private set; }
-        public double Y {  get; private set; }
-        public Vector2 Position { get => new Vector2((int)X, (int)Y); }
-        public SizeF Size { get; private set; }
+        public Size Size = new Size(25, 50);
+        public Vector2 Force;
 
         public double Speed { get; private set; }
         
@@ -26,18 +24,18 @@ namespace Dyhar.src.Entities
             X = x; 
             Y = y;
             Speed = 10.0;
+            Force = new Vector2(0, 0);
         }
 
         public void Move(Vector2 moveVector)
         {
-            X += moveVector.X;
-            Y += moveVector.Y;
+            Force += moveVector;
         }
 
         public void Move(double x, double y)
         {
-            X += x;
-            Y += y;
+            Force.X += (float)x;
+            Force.Y += (float)y;
         }
     }
 }
