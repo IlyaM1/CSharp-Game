@@ -1,23 +1,19 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using System;
-using System.Collections.Generic;
 using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Dyhar.src.Physics;
+using System;
 
 namespace Dyhar.src.Entities
 {
-    public class Player : GameObject
+    public class Player : MovingGameObject
     {
         public static Texture2D sprite;
 
-        public Size Size = new Size(25, 50);
-        public Vector2 Force;
+        bool IsInJump = false;
 
-        public double Speed { get; private set; }
-        
+        int NumberOfPossibleJumps = 2;
+        int JumpPower = 15;
 
         public Player(int x, int y)
         {
@@ -25,17 +21,33 @@ namespace Dyhar.src.Entities
             Y = y;
             Speed = 10.0;
             Force = new Vector2(0, 0);
+            SizeSprite = new Size(50, 100);
         }
 
-        public void Move(Vector2 moveVector)
+        public void MoveHorizontally(Direction direction)
         {
-            Force += moveVector;
+            if (direction == Direction.Left)
+                Force.X -= (float)Speed;
+            else if (direction == Direction.Right)
+                Force.X += (float)Speed;
+            else
+                throw new ArgumentException();
         }
 
-        public void Move(double x, double y)
+        public void Jump()
         {
-            Force.X += (float)x;
-            Force.Y += (float)y;
+            if (!IsInJump || NumberOfPossibleJumps > 0)
+            {
+                IsInJump = true;
+                NumberOfPossibleJumps -= 1;
+                Force.Y -= JumpPower;
+            }
+        }
+
+        public override void OnIsOnGround()
+        {
+            IsInJump = false;
+            //NumberOfPossibleJumps += 1;
         }
     }
 }

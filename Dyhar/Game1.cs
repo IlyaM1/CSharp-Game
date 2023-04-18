@@ -10,8 +10,8 @@ namespace Dyhar
 {
     public class Dyhar : Game
     {
-        public static readonly int width = 1920;
-        public static readonly int height = 1080;
+        public static readonly int width = 1280;
+        public static readonly int height = 720;
 
         private GraphicsDeviceManager _graphics;
         private SpriteBatch _spriteBatch;
@@ -39,7 +39,7 @@ namespace Dyhar
             player = new Player(150, 0);
             control.SetPlayer(player);
 
-            currentLevel = new Level(new[] {(GameObject)player}.ToList());
+            currentLevel = new Level(new[] {(MovingGameObject)player}.ToList());
 
             base.Initialize();
         }

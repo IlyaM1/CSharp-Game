@@ -1,11 +1,7 @@
 ﻿using Dyhar.src.Entities;
 using Microsoft.Xna.Framework.Input;
-using Microsoft.Xna.Framework;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Dyhar.src.Physics;
 
 namespace Dyhar.src.Control
 {
@@ -38,13 +34,11 @@ namespace Dyhar.src.Control
                 throw new Exception("Player isn't setted in control");
 
             if (keyboardState.IsKeyDown(Keys.A))
-                player.Move(-player.Speed, 0);
+                player.MoveHorizontally(Direction.Left);
             if (keyboardState.IsKeyDown(Keys.D))
-                player.Move(player.Speed, 0);
+                player.MoveHorizontally(Direction.Right);
             if (keyboardState.IsKeyDown(Keys.W))
-                player.Move(0, -player.Speed);
-            if (keyboardState.IsKeyDown(Keys.S))
-                player.Move(0, player.Speed);
+                player.Jump();
         }
 
         public void SetPlayer(Player player)

@@ -16,18 +16,21 @@ namespace Dyhar.src.Physics
             this.accelerationOfFreeFall = accelerationOfFreeFall;
         }
 
-        public bool IsOnGround(GameObject gameObject, Level level) 
+        public bool IsOnGround(MovingGameObject gameObject, Level level) 
         {
             if (gameObject == null)
                 throw new NullReferenceException();
 
-            //if (gameObject.Y >= Dyhar.height - gameObject.Size.Height)
-            //    return true;
-
+            if (Dyhar.height - gameObject.Y <= gameObject.SizeSprite.Height)
+            {
+                gameObject.OnIsOnGround();
+                return true;
+            }
+                
             return false;
         }
 
-        public Vector2 CountForce(GameObject gameObject, Level level)
+        public Vector2 CountForce(MovingGameObject gameObject, Level level)
         {
             if (gameObject == null)
                 throw new NullReferenceException();
@@ -40,20 +43,24 @@ namespace Dyhar.src.Physics
             else
                 newForce.Y = (float)(startForce.Y + accelerationOfFreeFall);
 
-            if (startForce.X < 0)
-                newForce.X = (float)(startForce.X + (frictionСoefficient * startForce.Y));
-            else if (startForce.X > 0)
-                newForce.X = (float)(startForce.X - (frictionСoefficient * startForce.Y));
+            newForce.X = startForce.X;
+            //if (startForce.X < 0)
+            //    newForce.X = (float)(startForce.X - (frictionСoefficient * startForce.Y));
+            //else if (startForce.X > 0)
+            //    newForce.X = (float)(startForce.X - (frictionСoefficient * startForce.Y));
 
             return newForce;
         }
 
-        public void Move(GameObject gameObject, Level level)
+        public void Move(MovingGameObject gameObject, Level level)
         {
             gameObject.X += gameObject.Force.X;
+            gameObject.Force.X = 0;
+
             gameObject.Y += gameObject.Force.Y;
-            if (gameObject.Y >= Dyhar.height - gameObject.Size.Height)
-                gameObject.Y = Dyhar.height - gameObject.Size.Height - 100;
+            if (Dyhar.height - gameObject.Y <= gameObject.SizeSprite.Height)
+                gameObject.Y = Dyhar.height - gameObject.SizeSprite.Height;
+
             gameObject.Force = CountForce(gameObject, level);
         }
     }
