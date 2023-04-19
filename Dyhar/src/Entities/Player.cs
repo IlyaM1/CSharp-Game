@@ -12,8 +12,8 @@ namespace Dyhar.src.Entities
 
         bool IsInJump = false;
 
-        int numberOfExtraJumps = 1;
-        int maxNumberOfExtraJumps = 1;
+        int numberOfExtraJumps = 3;
+        int maxNumberOfExtraJumps = 3;
         int JumpPower = 15;
         Reload multipleJumpsReload = new Reload("jump_reload", 1000);
 
@@ -23,7 +23,6 @@ namespace Dyhar.src.Entities
             Y = y;
             Speed = 10.0;
             Force = new Vector2(0, 0);
-            SizeSprite = new Size(50, 100);
         }
 
         public void MoveHorizontally(Direction direction)
@@ -62,7 +61,6 @@ namespace Dyhar.src.Entities
         public override void onUpdate(GameTime gameTime)
         {
             CheckAllReloads(gameTime);
-            // throw new NotImplementedException();
         }
 
         public void CheckAllReloads(GameTime gameTime)
@@ -79,5 +77,7 @@ namespace Dyhar.src.Entities
                 }
             }
         }
+
+        public override Texture2D GetSprite() => sprite;
     }
 }

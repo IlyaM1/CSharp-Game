@@ -6,10 +6,10 @@ namespace Dyhar.src.LevelsCreator
 {
     public class Level
     {
-        public List<MovingGameObject> gameObjects = new List<MovingGameObject>();
+        public List<GameObject> gameObjects = new List<GameObject>();
         public Physic physic;
 
-        public Level(List<MovingGameObject> gameObjects, double frictionСoefficient = 1, double accelerationOfFreeFall = 0.5)
+        public Level(List<GameObject> gameObjects, double frictionСoefficient = 1, double accelerationOfFreeFall = 0.5)
         {
             this.gameObjects = gameObjects;
 

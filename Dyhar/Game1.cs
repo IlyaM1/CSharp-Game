@@ -39,10 +39,18 @@ namespace Dyhar
             _graphics.PreferredBackBufferHeight = height;
             _graphics.ApplyChanges();
 
+            LoadContent();
+
             player = new Player(150, 0);
             control.SetPlayer(player);
 
-            currentLevel = new Level(new[] {(MovingGameObject)player}.ToList());
+            currentLevel = new Level(new[] {(GameObject)player}.ToList());
+            for (var i = 0; i < 10; i++)
+                for (var j = 0; j < 10; j++)
+                    currentLevel.gameObjects.Add(new EarthBlock(i * 25, j * 25));
+
+            for (var i = 0;i < 10;i++)
+                currentLevel.gameObjects.Add(new EarthBlock(i * 25, 500));
 
             base.Initialize();
         }
@@ -53,6 +61,7 @@ namespace Dyhar
 
             Player.sprite = Content.Load<Texture2D>("player");
             standardFont = Content.Load<SpriteFont>("galleryFont");
+            EarthBlock.sprite = Content.Load<Texture2D>("Earth");
         }
 
         protected override void Update(GameTime gameTime)
@@ -64,9 +73,10 @@ namespace Dyhar
 
             for (var i = 0; i < currentLevel.gameObjects.Count; i++)
             {
-                if (TypesUtils.CanBeDownCasted<GameObject, MovingGameObject>(currentLevel.gameObjects[i]))
-                    currentLevel.physic.Move(currentLevel.gameObjects[i], currentLevel);
-                currentLevel.gameObjects[i].onUpdate(gameTime);
+                var gameObject = currentLevel.gameObjects[i];
+                if (TypesUtils.CanBeDownCasted<GameObject, MovingGameObject>(gameObject))
+                    currentLevel.physic.Move((MovingGameObject)gameObject, currentLevel);
+                gameObject.onUpdate(gameTime);
             }
 
             base.Update(gameTime);
@@ -77,7 +87,11 @@ namespace Dyhar
             GraphicsDevice.Clear(Color.CornflowerBlue);
 
             _spriteBatch.Begin();
-            _spriteBatch.Draw(Player.sprite, player.Position, Color.White);
+            for (var i = 0; i < currentLevel.gameObjects.Count; i++)
+            {
+                var gameObject = currentLevel.gameObjects[i];
+                _spriteBatch.Draw(gameObject.GetSprite(), gameObject.Position, Color.White);
+            }
             _spriteBatch.End();
 
             base.Draw(gameTime);

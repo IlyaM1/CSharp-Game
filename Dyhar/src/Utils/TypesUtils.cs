@@ -1,4 +1,6 @@
-﻿namespace Dyhar.src.Utils
+﻿using Dyhar.src.Entities;
+
+namespace Dyhar.src.Utils
 {
     public static class TypesUtils
     {
@@ -11,6 +13,11 @@
                 return true;
             else
                 return false;
+        }
+
+        public static object GetStaticFieldFromInstance<TObject>(TObject obj, string staticFieldName)
+        {
+            return obj.GetType().GetProperty(staticFieldName).GetValue(obj);
         }
     }
 }

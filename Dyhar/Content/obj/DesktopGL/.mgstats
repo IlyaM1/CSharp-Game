@@ -1,2 +1,2 @@
 Source File,Dest File,Processor Type,Content Type,Source File Size,Dest File Size,Build Seconds
-"D:/Programming/CSharp-Game/Dyhar/Content/galleryFont.spritefont","D:/Programming/CSharp-Game/Dyhar/Content/bin/DesktopGL/galleryFont.xnb","FontDescriptionProcessor","SpriteFontContent",2065,70687,0,254805
+"D:/Programming/CSharp-Game/Dyhar/Content/Earth.png","D:/Programming/CSharp-Game/Dyhar/Content/bin/DesktopGL/Earth.xnb","TextureProcessor","Texture2DContent",152,2585,0,1688608
