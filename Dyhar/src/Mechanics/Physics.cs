@@ -3,7 +3,7 @@ using Dyhar.src.LevelsCreator;
 using System;
 using System.Numerics;
 
-namespace Dyhar.src.Physics
+namespace Dyhar.src.Mechanics
 {
     public class Physic
     {

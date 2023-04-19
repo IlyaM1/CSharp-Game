@@ -1,7 +1,8 @@
 ﻿using Dyhar.src.Entities;
 using Microsoft.Xna.Framework.Input;
 using System;
-using Dyhar.src.Physics;
+using Dyhar.src.Mechanics;
+using System.Collections.Generic;
 
 namespace Dyhar.src.Control
 {
@@ -16,6 +17,8 @@ namespace Dyhar.src.Control
     {
         ControlState State { get; set; }
         Player player;
+
+        List<Keys> pressedKeys = new List<Keys>();
 
         public Control(ControlState state)
         {
@@ -34,11 +37,30 @@ namespace Dyhar.src.Control
                 throw new Exception("Player isn't setted in control");
 
             if (keyboardState.IsKeyDown(Keys.A))
-                player.MoveHorizontally(Direction.Left);
+                PressButton(Keys.A, () => player.MoveHorizontally(Direction.Left));
             if (keyboardState.IsKeyDown(Keys.D))
-                player.MoveHorizontally(Direction.Right);
-            if (keyboardState.IsKeyDown(Keys.W))
-                player.Jump();
+                PressButton(Keys.D, () => player.MoveHorizontally(Direction.Right));
+            if (keyboardState.IsKeyDown(Keys.W) && !pressedKeys.Contains(Keys.W))
+                PressButton(Keys.W, () => player.Jump());
+
+            RemoveUnpressedKeys(keyboardState);
+        }
+
+        private void PressButton(Keys key, Action action)
+        {
+            pressedKeys.Add(key);
+            action();
+        }
+
+        private void RemoveUnpressedKeys(KeyboardState keyboardState)
+        {
+            var unpressedKeys = new List<Keys>();
+            foreach (var key in pressedKeys)
+                if (keyboardState.IsKeyUp(key))
+                    unpressedKeys.Add(key);
+
+            foreach(var key in unpressedKeys)
+                pressedKeys.Remove(key);
         }
 
         public void SetPlayer(Player player)

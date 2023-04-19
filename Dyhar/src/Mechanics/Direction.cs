@@ -1,4 +1,4 @@
-﻿namespace Dyhar.src.Physics;
+﻿namespace Dyhar.src.Mechanics;
 
 public enum Direction
 {

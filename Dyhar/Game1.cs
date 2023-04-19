@@ -1,9 +1,12 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+
 using Dyhar.src.Entities;
 using Dyhar.src.Control;
 using Dyhar.src.LevelsCreator;
+using Dyhar.src.Utils;
+
 using System.Linq;
 
 namespace Dyhar
@@ -57,13 +60,13 @@ namespace Dyhar
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
 
-            var currentMouseState = Mouse.GetState();
-            var currentKeyboardState = Keyboard.GetState();
-            control.onUpdate(currentMouseState, currentKeyboardState);
+            control.onUpdate(Mouse.GetState(), Keyboard.GetState());
 
             for (var i = 0; i < currentLevel.gameObjects.Count; i++)
             {
-                currentLevel.physic.Move(currentLevel.gameObjects[0], currentLevel);
+                if (TypesUtils.CanBeDownCasted<GameObject, MovingGameObject>(currentLevel.gameObjects[i]))
+                    currentLevel.physic.Move(currentLevel.gameObjects[i], currentLevel);
+                currentLevel.gameObjects[i].onUpdate(gameTime);
             }
 
             base.Update(gameTime);

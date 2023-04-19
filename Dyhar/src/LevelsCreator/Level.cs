@@ -1,5 +1,5 @@
 ﻿using Dyhar.src.Entities;
-using Dyhar.src.Physics;
+using Dyhar.src.Mechanics;
 using System.Collections.Generic;
 
 namespace Dyhar.src.LevelsCreator

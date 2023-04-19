@@ -1,7 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System.Drawing;
-using Dyhar.src.Physics;
+using Dyhar.src.Mechanics;
 using System;
 
 namespace Dyhar.src.Entities
@@ -12,8 +12,10 @@ namespace Dyhar.src.Entities
 
         bool IsInJump = false;
 
-        int NumberOfPossibleJumps = 2;
+        int numberOfExtraJumps = 1;
+        int maxNumberOfExtraJumps = 1;
         int JumpPower = 15;
+        Reload multipleJumpsReload = new Reload("jump_reload", 1000);
 
         public Player(int x, int y)
         {
@@ -36,18 +38,46 @@ namespace Dyhar.src.Entities
 
         public void Jump()
         {
-            if (!IsInJump || NumberOfPossibleJumps > 0)
+            if (!IsInJump)
             {
                 IsInJump = true;
-                NumberOfPossibleJumps -= 1;
-                Force.Y -= JumpPower;
+                Force.Y = -JumpPower;
+                return;
+            }
+            else if (IsInJump && numberOfExtraJumps > 0)
+            {
+                numberOfExtraJumps -= 1;
+                if (multipleJumpsReload.State == ReloadState.NotStarted)
+                    multipleJumpsReload.Start();
+                Force.Y = -JumpPower;
+                return;
             }
         }
 
         public override void OnIsOnGround()
         {
             IsInJump = false;
-            //NumberOfPossibleJumps += 1;
+        }
+
+        public override void onUpdate(GameTime gameTime)
+        {
+            CheckAllReloads(gameTime);
+            // throw new NotImplementedException();
+        }
+
+        public void CheckAllReloads(GameTime gameTime)
+        {
+            multipleJumpsReload.OnUpdate(gameTime);
+            if (multipleJumpsReload.State == ReloadState.Finished)
+            {
+                if (numberOfExtraJumps < maxNumberOfExtraJumps)
+                {
+                    numberOfExtraJumps += 1;
+                    multipleJumpsReload.CompletedFinishedCheck();
+                    if (numberOfExtraJumps < maxNumberOfExtraJumps)
+                        multipleJumpsReload.Start();
+                }
+            }
         }
     }
 }

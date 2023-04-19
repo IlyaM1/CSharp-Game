@@ -10,4 +10,6 @@ public abstract class GameObject
     public Vector2 Position { get => new Vector2((int)X, (int)Y); }
 
     public Size SizeSprite;
+
+    public abstract void onUpdate(GameTime gameTime);
 }
