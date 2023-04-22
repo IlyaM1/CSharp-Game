@@ -5,10 +5,12 @@
   <Config />
   <SourceFiles>
     <File>D:/Programming/CSharp-Game/Dyhar/Content/Earth.png</File>
+    <File>D:/Programming/CSharp-Game/Dyhar/Content/Earth2.png</File>
     <File>D:/Programming/CSharp-Game/Dyhar/Content/galleryFont.spritefont</File>
     <File>D:/Programming/CSharp-Game/Dyhar/Content/player.png</File>
   </SourceFiles>
   <DestFiles>
+    <File xsi:nil="true" />
     <File xsi:nil="true" />
     <File xsi:nil="true" />
     <File xsi:nil="true" />

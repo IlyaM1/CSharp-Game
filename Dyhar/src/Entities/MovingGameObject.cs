@@ -7,7 +7,8 @@ namespace Dyhar.src.Entities
     {
         public Vector2 Force;
         public double Speed { get; set; }
+        public bool IsOnGround { get; set; }
 
-        public abstract void OnIsOnGround();
+        public abstract void onIsOnGround();
     }
 }

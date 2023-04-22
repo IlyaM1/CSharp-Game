@@ -13,7 +13,7 @@ namespace Dyhar.src.LevelsCreator
         {
             this.gameObjects = gameObjects;
 
-            physic = new Physic(frictionСoefficient, accelerationOfFreeFall);
+            physic = new Physic(this);
         }
     }
 }

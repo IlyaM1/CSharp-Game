@@ -13,8 +13,8 @@ namespace Dyhar
 {
     public class Dyhar : Game
     {
-        public static readonly int width = 1280;
-        public static readonly int height = 720;
+        public static readonly int width = 1300;
+        public static readonly int height = 800;
 
         private GraphicsDeviceManager _graphics;
         private SpriteBatch _spriteBatch;
@@ -41,15 +41,12 @@ namespace Dyhar
 
             LoadContent();
 
-            player = new Player(150, 0);
+            player = new Player(1000, 0);
             control.SetPlayer(player);
 
             currentLevel = new Level(new[] {(GameObject)player}.ToList());
-            for (var i = 0; i < 10; i++)
-                for (var j = 0; j < 10; j++)
-                    currentLevel.gameObjects.Add(new EarthBlock(i * 25, j * 25));
 
-            for (var i = 0;i < 10;i++)
+            for (var i = 10; i < 20;i++)
                 currentLevel.gameObjects.Add(new EarthBlock(i * 25, 500));
 
             base.Initialize();
@@ -61,7 +58,7 @@ namespace Dyhar
 
             Player.sprite = Content.Load<Texture2D>("player");
             standardFont = Content.Load<SpriteFont>("galleryFont");
-            EarthBlock.sprite = Content.Load<Texture2D>("Earth");
+            EarthBlock.sprite = Content.Load<Texture2D>("Earth2");
         }
 
         protected override void Update(GameTime gameTime)
@@ -75,7 +72,9 @@ namespace Dyhar
             {
                 var gameObject = currentLevel.gameObjects[i];
                 if (TypesUtils.CanBeDownCasted<GameObject, MovingGameObject>(gameObject))
-                    currentLevel.physic.Move((MovingGameObject)gameObject, currentLevel);
+                {
+                    currentLevel.physic.Move((MovingGameObject)gameObject);
+                }    
                 gameObject.onUpdate(gameTime);
             }
 

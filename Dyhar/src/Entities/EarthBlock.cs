@@ -12,6 +12,7 @@ public class EarthBlock : GameObject
     {
         X = x;
         Y = y;
+        IsSolid = true;
     }
 
     public override void onUpdate(GameTime gameTime)
@@ -20,4 +21,9 @@ public class EarthBlock : GameObject
     }
 
     public override Texture2D GetSprite() => sprite;
+
+    public override void onCollision(GameObject collisionObject)
+    {
+        return;
+    }
 }
