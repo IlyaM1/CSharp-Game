@@ -8,26 +8,26 @@ using Dyhar.src.LevelsCreator;
 using Dyhar.src.Utils;
 
 using System.Linq;
+using Dyhar.src.Drawing;
 
 namespace Dyhar
 {
     public class Dyhar : Game
     {
-        public static readonly int width = 1300;
-        public static readonly int height = 800;
-
         private GraphicsDeviceManager _graphics;
         private SpriteBatch _spriteBatch;
+        private VirtualResolution _virtualResolution;
         SpriteFont standardFont;
 
         Player player;
-        Control control = new Control(ControlState.Game);
+        Control control = new Control(ControlState.Game);  
 
         Level currentLevel;
 
         public Dyhar()
         {
             _graphics = new GraphicsDeviceManager(this);
+            
             Content.RootDirectory = "Content";
             IsMouseVisible = true;
         }
@@ -35,8 +35,8 @@ namespace Dyhar
         protected override void Initialize()
         {
             // _graphics.IsFullScreen = true;
-            _graphics.PreferredBackBufferWidth = width;
-            _graphics.PreferredBackBufferHeight = height;
+            _graphics.PreferredBackBufferWidth = VirtualResolution.actualWidth;
+            _graphics.PreferredBackBufferHeight = VirtualResolution.actualHeight;
             _graphics.ApplyChanges();
 
             LoadContent();
@@ -46,8 +46,8 @@ namespace Dyhar
 
             currentLevel = new Level(new[] {(GameObject)player}.ToList());
 
-            for (var i = 10; i < 20;i++)
-                currentLevel.gameObjects.Add(new EarthBlock(i * 25, 500));
+            for (var i = 10; i < 20; i++)
+                currentLevel.gameObjects.Add(new EarthBlock(i * 25, 600));
 
             base.Initialize();
         }
@@ -55,6 +55,7 @@ namespace Dyhar
         protected override void LoadContent()
         {
             _spriteBatch = new SpriteBatch(GraphicsDevice);
+            _virtualResolution = new VirtualResolution(_spriteBatch);
 
             Player.sprite = Content.Load<Texture2D>("player");
             standardFont = Content.Load<SpriteFont>("galleryFont");
@@ -89,7 +90,7 @@ namespace Dyhar
             for (var i = 0; i < currentLevel.gameObjects.Count; i++)
             {
                 var gameObject = currentLevel.gameObjects[i];
-                _spriteBatch.Draw(gameObject.GetSprite(), gameObject.Position, Color.White);
+                _virtualResolution.Draw(gameObject);
             }
             _spriteBatch.End();
 

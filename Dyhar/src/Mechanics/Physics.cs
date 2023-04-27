@@ -1,4 +1,5 @@
-﻿using Dyhar.src.Entities;
+﻿using Dyhar.src.Drawing;
+using Dyhar.src.Entities;
 using Dyhar.src.LevelsCreator;
 using System;
 using System.Collections.Generic;
@@ -21,7 +22,7 @@ namespace Dyhar.src.Mechanics
 
         public void CheckObjectIsOnGround(MovingGameObject gameObject) 
         {
-            if (Dyhar.height - gameObject.Y == gameObject.SizeSprite.Height)
+            if (VirtualResolution.etalonHeight - gameObject.Y == gameObject.SizeSprite.Height)
             {
                 gameObject.onIsOnGround();
                 gameObject.IsOnGround = true;
@@ -94,8 +95,8 @@ namespace Dyhar.src.Mechanics
                 }
             }
 
-                if (Dyhar.height - gameObject.Y <= gameObject.SizeSprite.Height)
-                gameObject.Y = Dyhar.height - gameObject.SizeSprite.Height;
+                if (VirtualResolution.etalonHeight - gameObject.Y <= gameObject.SizeSprite.Height)
+                gameObject.Y = VirtualResolution.etalonHeight - gameObject.SizeSprite.Height;
 
             CheckObjectIsOnGround(gameObject);
             gameObject.Force = CountForce(gameObject);
