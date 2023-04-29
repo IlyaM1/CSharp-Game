@@ -13,7 +13,7 @@ namespace Dyhar.src.Control
         Interface
     }
 
-    public class Control
+    public sealed class Control
     {
         ControlState State { get; set; }
         Player player;

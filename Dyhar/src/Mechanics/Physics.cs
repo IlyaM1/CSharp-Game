@@ -7,7 +7,7 @@ using System.Numerics;
 
 namespace Dyhar.src.Mechanics
 {
-    public class Physic
+    public sealed class Physic
     {
         private Level level;
         private double frictionСoefficient { get; set; }
@@ -95,11 +95,31 @@ namespace Dyhar.src.Mechanics
                 }
             }
 
-                if (VirtualResolution.etalonHeight - gameObject.Y <= gameObject.SizeSprite.Height)
-                gameObject.Y = VirtualResolution.etalonHeight - gameObject.SizeSprite.Height;
+            NormalizeObjectPosition(gameObject);
 
             CheckObjectIsOnGround(gameObject);
             gameObject.Force = CountForce(gameObject);
+        }
+
+        private void NormalizeObjectPosition(MovingGameObject gameObject)
+        {
+            if (gameObject.Y + gameObject.SizeSprite.Height >= level.Height)
+            {
+                gameObject.Y = level.Height - gameObject.SizeSprite.Height;
+                gameObject.Force.Y = 0;
+            }
+
+            if (gameObject.Y <= 0)
+            {
+                gameObject.Force.Y = 0;
+                gameObject.Y = 0;
+            }
+
+            if (gameObject.X <= 0)
+                gameObject.X = 0;
+
+            if (gameObject.X + gameObject.SizeSprite.Width >= level.Width)
+                gameObject.X = level.Width - gameObject.SizeSprite.Width;  
         }
 
         public Direction FindDirectionOfCollision(MovingGameObject gameObject, GameObject collisionedGameObject)

@@ -4,7 +4,7 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Dyhar.src.Drawing;
 
-public class VirtualResolution
+public sealed class VirtualResolution
 {
     public static readonly int etalonWidth = 1600;
     public static readonly int etalonHeight = 900;

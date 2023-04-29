@@ -20,7 +20,8 @@ namespace Dyhar
         SpriteFont standardFont;
 
         Player player;
-        Control control = new Control(ControlState.Game);  
+        Control control = new Control(ControlState.Game);
+        Camera camera;
 
         Level currentLevel;
 
@@ -28,6 +29,7 @@ namespace Dyhar
         {
             _graphics = new GraphicsDeviceManager(this);
             
+
             Content.RootDirectory = "Content";
             IsMouseVisible = true;
         }
@@ -41,7 +43,7 @@ namespace Dyhar
 
             LoadContent();
 
-            player = new Player(1000, 0);
+            player = new Player(0, 0);
             control.SetPlayer(player);
 
             currentLevel = new Level(new[] {(GameObject)player}.ToList());
@@ -60,6 +62,8 @@ namespace Dyhar
             Player.sprite = Content.Load<Texture2D>("player");
             standardFont = Content.Load<SpriteFont>("galleryFont");
             EarthBlock.sprite = Content.Load<Texture2D>("Earth2");
+
+            camera = new Camera(_graphics.GraphicsDevice.Viewport);
         }
 
         protected override void Update(GameTime gameTime)
@@ -86,7 +90,9 @@ namespace Dyhar
         {
             GraphicsDevice.Clear(Color.CornflowerBlue);
 
-            _spriteBatch.Begin();
+
+            camera.Update(player.Position, currentLevel.Width, currentLevel.Height);
+            _spriteBatch.Begin(transformMatrix: camera.Transform);
             for (var i = 0; i < currentLevel.gameObjects.Count; i++)
             {
                 var gameObject = currentLevel.gameObjects[i];

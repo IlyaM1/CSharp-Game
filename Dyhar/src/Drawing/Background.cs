@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Dyhar.src.Drawing
 {
-    public class Background
+    public sealed class Background
     {
 
     }

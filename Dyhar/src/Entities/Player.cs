@@ -13,9 +13,9 @@ namespace Dyhar.src.Entities
         bool IsInJump = false;
 
         int numberOfExtraJumps = 1;
-        int maxNumberOfExtraJumps = 1;
+        int maxNumberOfExtraJumps = 3;
         int JumpPower = 15;
-        Reload multipleJumpsReload = new Reload("jump_reload", 1000);
+        Reload multipleJumpsReload = new Reload("jump_reload", 1);
 
         public Player(int x, int y)
         {
