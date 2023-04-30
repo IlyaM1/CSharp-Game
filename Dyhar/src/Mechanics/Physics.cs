@@ -22,7 +22,7 @@ namespace Dyhar.src.Mechanics
 
         public void CheckObjectIsOnGround(MovingGameObject gameObject) 
         {
-            if (VirtualResolution.etalonHeight - gameObject.Y == gameObject.SizeSprite.Height)
+            if (Resolution.etalonHeight - gameObject.Y == gameObject.SizeSprite.Height)
             {
                 gameObject.onIsOnGround();
                 gameObject.IsOnGround = true;

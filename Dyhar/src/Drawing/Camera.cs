@@ -18,8 +18,8 @@ public class Camera
     public Camera(Viewport viewport)
     {
         this.viewport = viewport;
-        ZoomWidth = (float)VirtualResolution.kWidth;
-        ZoomHeight = (float)VirtualResolution.kHeight;
+        ZoomWidth = (float)Resolution.kWidth;
+        ZoomHeight = (float)Resolution.kHeight;
     }
 
     public void Update(Vector2 position, int mapWidth, int mapHeight)

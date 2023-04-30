@@ -16,7 +16,7 @@ namespace Dyhar
     {
         private GraphicsDeviceManager _graphics;
         private SpriteBatch _spriteBatch;
-        private VirtualResolution _virtualResolution;
+        private Resolution _virtualResolution;
         SpriteFont standardFont;
 
         Player player;
@@ -37,8 +37,8 @@ namespace Dyhar
         protected override void Initialize()
         {
             // _graphics.IsFullScreen = true;
-            _graphics.PreferredBackBufferWidth = VirtualResolution.actualWidth;
-            _graphics.PreferredBackBufferHeight = VirtualResolution.actualHeight;
+            _graphics.PreferredBackBufferWidth = Resolution.actualWidth;
+            _graphics.PreferredBackBufferHeight = Resolution.actualHeight;
             _graphics.ApplyChanges();
 
             LoadContent();
@@ -57,7 +57,6 @@ namespace Dyhar
         protected override void LoadContent()
         {
             _spriteBatch = new SpriteBatch(GraphicsDevice);
-            _virtualResolution = new VirtualResolution(_spriteBatch);
 
             Player.sprite = Content.Load<Texture2D>("player");
             standardFont = Content.Load<SpriteFont>("galleryFont");
@@ -96,7 +95,7 @@ namespace Dyhar
             for (var i = 0; i < currentLevel.gameObjects.Count; i++)
             {
                 var gameObject = currentLevel.gameObjects[i];
-                _virtualResolution.Draw(gameObject);
+                _spriteBatch.Draw(gameObject.GetSprite(), gameObject.Position, Color.White);
             }
             _spriteBatch.End();
 
