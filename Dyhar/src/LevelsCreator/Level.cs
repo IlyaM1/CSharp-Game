@@ -7,6 +7,7 @@ namespace Dyhar.src.LevelsCreator
     public class Level
     {
         public List<GameObject> gameObjects = new List<GameObject>();
+        public List<IWeaponUser> weaponUsers = new List<IWeaponUser>();
         public Physic physic;
 
         public int Width { get; set; }

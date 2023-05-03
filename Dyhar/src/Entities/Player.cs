@@ -6,7 +6,7 @@ using System;
 
 namespace Dyhar.src.Entities
 {
-    public class Player : MovingGameObject
+    public class Player : MovingGameObject, IWeaponUser
     {
         public static Texture2D sprite;
 
@@ -15,7 +15,11 @@ namespace Dyhar.src.Entities
         int numberOfExtraJumps = 1;
         int maxNumberOfExtraJumps = 3;
         int JumpPower = 15;
-        Reload multipleJumpsReload = new Reload("jump_reload", 1);
+        Reload multipleJumpsReload = new Reload("jump_reload", 10);
+
+        public Direction DirectionLook { get; set; }
+        public MeleeWeapon CurrentWeapon { get; set; }
+        public Reload attackAnimationReload = new Reload("attack_animation", 500);
 
         public Player(int x, int y)
         {
@@ -24,6 +28,8 @@ namespace Dyhar.src.Entities
             Speed = 10.0;
             Force = new Vector2(0, 0);
             IsSolid = false;
+            DirectionLook = Direction.Right;
+            CurrentWeapon = new Sword(this);
         }
 
         public void MoveHorizontally(Direction direction)
@@ -47,8 +53,7 @@ namespace Dyhar.src.Entities
             else if (IsInJump && numberOfExtraJumps > 0)
             {
                 numberOfExtraJumps -= 1;
-                if (multipleJumpsReload.State == ReloadState.NotStarted)
-                    multipleJumpsReload.Start();
+                multipleJumpsReload.Start();
                 Force.Y = -JumpPower;
                 return;
             }
@@ -62,6 +67,7 @@ namespace Dyhar.src.Entities
         public override void onUpdate(GameTime gameTime)
         {
             CheckAllReloads(gameTime);
+            DirectionLook = (Force.X > 0) ? Direction.Right : Direction.Left;
         }
 
         public void CheckAllReloads(GameTime gameTime)
@@ -77,6 +83,10 @@ namespace Dyhar.src.Entities
                         multipleJumpsReload.Start();
                 }
             }
+
+            attackAnimationReload.OnUpdate(gameTime);
+            if (attackAnimationReload.State == ReloadState.Finished)
+                attackAnimationReload.CompletedFinishedCheck();
         }
 
         public override Texture2D GetSprite() => sprite;
@@ -85,5 +95,25 @@ namespace Dyhar.src.Entities
         {
             return;
         }
+
+        public Vector2 FindWeaponStart()
+        {
+            if (DirectionLook == Direction.Right)
+                return new Vector2((float)(X + SizeSprite.Width), (float)(Y + (SizeSprite.Height / 2)));
+            if (DirectionLook == Direction.Left)
+                return new Vector2((float)(X), (float)(Y + (SizeSprite.Height / 2)));
+
+            throw new Exception("Impossible Direction");
+        }
+
+        public void onAttack()
+        {
+            attackAnimationReload.Start();
+        }
+
+        public bool IsAttacking() => attackAnimationReload.State == ReloadState.Reloading;
+
+        public MeleeWeapon GetCurrentWeapon() => CurrentWeapon;
+        public Direction GetDirection() => DirectionLook;
     }
 }

@@ -19,6 +19,7 @@ namespace Dyhar.src.Control
         Player player;
 
         List<Keys> pressedKeys = new List<Keys>();
+        bool isPressedLeftMouse = false;
 
         public Control(ControlState state)
         {
@@ -43,12 +44,22 @@ namespace Dyhar.src.Control
             if (keyboardState.IsKeyDown(Keys.W) && !pressedKeys.Contains(Keys.W))
                 PressButton(Keys.W, () => player.Jump());
 
+            if (mouseState.LeftButton == ButtonState.Pressed && !isPressedLeftMouse)
+                PressLeftMouse(() => player.onAttack());
+
             RemoveUnpressedKeys(keyboardState);
+            UnpressLeftMouse(mouseState);
         }
 
         private void PressButton(Keys key, Action action)
         {
             pressedKeys.Add(key);
+            action();
+        }
+
+        private void PressLeftMouse(Action action)
+        {
+            isPressedLeftMouse = true;
             action();
         }
 
@@ -61,6 +72,12 @@ namespace Dyhar.src.Control
 
             foreach(var key in unpressedKeys)
                 pressedKeys.Remove(key);
+        }
+
+        private void UnpressLeftMouse(MouseState mouseState)
+        {
+            if (mouseState.LeftButton == ButtonState.Released)
+                isPressedLeftMouse = false;
         }
 
         public void SetPlayer(Player player)

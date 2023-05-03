@@ -1,5 +1,4 @@
 ﻿using Microsoft.Xna.Framework;
-using System.Drawing;
 
 namespace Dyhar.src.Entities
 {

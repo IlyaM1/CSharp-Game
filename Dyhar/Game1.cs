@@ -47,6 +47,7 @@ namespace Dyhar
             control.SetPlayer(player);
 
             currentLevel = new Level(new[] {(GameObject)player}.ToList());
+            currentLevel.weaponUsers.Add(player);
 
             for (var i = 10; i < 20; i++)
                 currentLevel.gameObjects.Add(new EarthBlock(i * 25, 600));
@@ -59,8 +60,10 @@ namespace Dyhar
             _spriteBatch = new SpriteBatch(GraphicsDevice);
 
             Player.sprite = Content.Load<Texture2D>("player");
-            standardFont = Content.Load<SpriteFont>("galleryFont");
             EarthBlock.sprite = Content.Load<Texture2D>("Earth2");
+            Sword.sprite = Content.Load<Texture2D>("Sword");
+
+            standardFont = Content.Load<SpriteFont>("galleryFont");
 
             camera = new Camera(_graphics.GraphicsDevice.Viewport);
         }
@@ -76,11 +79,17 @@ namespace Dyhar
             {
                 var gameObject = currentLevel.gameObjects[i];
                 if (TypesUtils.CanBeDownCasted<GameObject, MovingGameObject>(gameObject))
-                {
                     currentLevel.physic.Move((MovingGameObject)gameObject);
-                }    
+
+                foreach (var weaponUser in currentLevel.weaponUsers)
+                    if (weaponUser.IsAttacking())
+                        if (weaponUser.GetCurrentWeapon().CheckCollision(gameObject, weaponUser.GetDirection()))
+                            gameObject.onAttacked(weaponUser.GetCurrentWeapon());
+
                 gameObject.onUpdate(gameTime);
             }
+
+
 
             base.Update(gameTime);
         }
@@ -89,7 +98,6 @@ namespace Dyhar
         {
             GraphicsDevice.Clear(Color.CornflowerBlue);
 
-
             camera.Update(player.Position, currentLevel.Width, currentLevel.Height);
             _spriteBatch.Begin(transformMatrix: camera.Transform);
             for (var i = 0; i < currentLevel.gameObjects.Count; i++)
@@ -97,6 +105,7 @@ namespace Dyhar
                 var gameObject = currentLevel.gameObjects[i];
                 _spriteBatch.Draw(gameObject.GetSprite(), gameObject.Position, Color.White);
             }
+            _spriteBatch.Draw(Sword.sprite, new Vector2(50, 1140), Color.White);
             _spriteBatch.End();
 
             base.Draw(gameTime);

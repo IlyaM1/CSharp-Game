@@ -38,6 +38,9 @@ public class Reload
 
     public void Start(GameTime gameTime)
     {
+        if (State != ReloadState.NotStarted)
+            return;
+
         StartTime = gameTime.TotalGameTime;
         if (ReloadTimeInMilliseconds == 0)
             throw new ArgumentException();

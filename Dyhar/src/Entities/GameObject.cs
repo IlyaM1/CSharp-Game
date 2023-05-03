@@ -18,7 +18,7 @@ public abstract class GameObject
     public abstract void onCollision(GameObject collisionObject);
     public abstract Texture2D GetSprite();
 
-    public bool CheckCollision(GameObject otherObject)
+    public virtual bool CheckCollision(GameObject otherObject)
     {
         return GameObject.CheckCollision(X, Y, SizeSprite, otherObject.X, otherObject.Y, otherObject.SizeSprite);
     }
@@ -37,5 +37,10 @@ public abstract class GameObject
 
         // если ни одно из условий непересечения не сработало, значит они перескаются
         return !(tooLeft || tooRight || tooHigh || tooLow);
+    }
+
+    public virtual void onAttacked(MeleeWeapon weapon)
+    {
+        return;
     }
 }

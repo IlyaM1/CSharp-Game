@@ -140,7 +140,7 @@ namespace Dyhar.src.Mechanics
             if (gameObject.X >= rightPartOtherGameObject)
                 return Direction.Right;
 
-            throw new ArgumentException();
+            return Direction.Left;
         }
 
         public void MoveObjectCloseAsPossible(MovingGameObject gameObject, GameObject collisionedGameObject, Direction directionOfCollision)
