@@ -1,7 +1,8 @@
-﻿using Dyhar.src.Mechanics;
+﻿using Dyhar.src.Entities.AbstractClasses;
+using Dyhar.src.Mechanics;
 using Microsoft.Xna.Framework;
 
-namespace Dyhar.src.Entities;
+namespace Dyhar.src.Entities.Interfaces;
 
 public interface IWeaponUser
 {

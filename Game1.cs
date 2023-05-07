@@ -9,6 +9,7 @@ using Dyhar.src.Utils;
 
 using System.Linq;
 using Dyhar.src.Drawing;
+using Dyhar.src.Entities.AbstractClasses;
 
 namespace Dyhar
 {
@@ -16,7 +17,6 @@ namespace Dyhar
     {
         private GraphicsDeviceManager _graphics;
         private SpriteBatch _spriteBatch;
-        private Resolution _virtualResolution;
         SpriteFont standardFont;
 
         Player player;

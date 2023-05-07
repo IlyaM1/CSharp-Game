@@ -2,6 +2,8 @@
 using Microsoft.Xna.Framework.Graphics;
 using Dyhar.src.Mechanics;
 using System;
+using Dyhar.src.Entities.Interfaces;
+using Dyhar.src.Entities.AbstractClasses;
 
 namespace Dyhar.src.Entities
 {

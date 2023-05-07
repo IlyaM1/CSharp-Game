@@ -1,6 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 
-namespace Dyhar.src.Entities
+namespace Dyhar.src.Entities.AbstractClasses
 {
     public abstract class MovingGameObject : GameObject
     {

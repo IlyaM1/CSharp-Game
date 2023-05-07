@@ -1,7 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
-namespace Dyhar.src.Entities;
+namespace Dyhar.src.Entities.AbstractClasses;
 
 public abstract class GameObject
 {
@@ -13,13 +13,13 @@ public abstract class GameObject
     public bool IsSolid { get; set; }
 
 
-    public abstract void onUpdate(GameTime gameTime);  
+    public abstract void onUpdate(GameTime gameTime);
     public abstract void onCollision(GameObject collisionObject);
     public abstract Texture2D GetSprite();
 
     public virtual bool CheckCollision(GameObject otherObject)
     {
-        return GameObject.CheckCollision(X, Y, SizeSprite, otherObject.X, otherObject.Y, otherObject.SizeSprite);
+        return CheckCollision(X, Y, SizeSprite, otherObject.X, otherObject.Y, otherObject.SizeSprite);
     }
 
     public static bool CheckCollision(double firstObjectX, double firstObjectY, System.Drawing.SizeF firstObjectSize,

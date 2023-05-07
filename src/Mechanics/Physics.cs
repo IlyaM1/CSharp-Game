@@ -1,5 +1,5 @@
 ﻿using Dyhar.src.Drawing;
-using Dyhar.src.Entities;
+using Dyhar.src.Entities.AbstractClasses;
 using Dyhar.src.LevelsCreator;
 using System;
 using System.Collections.Generic;

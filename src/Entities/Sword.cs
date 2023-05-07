@@ -1,4 +1,6 @@
-﻿using Dyhar.src.Mechanics;
+﻿using Dyhar.src.Entities.AbstractClasses;
+using Dyhar.src.Entities.Interfaces;
+using Dyhar.src.Mechanics;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
@@ -43,6 +45,5 @@ namespace Dyhar.src.Entities
                 spriteBatch.Draw(sprite, swordPosition, null, Color.White, angle, Vector2.Zero, 1f, SpriteEffects.None, 0f);
             }
         }
-
     }
 }

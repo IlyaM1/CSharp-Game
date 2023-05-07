@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework;
+﻿using Dyhar.src.Entities.AbstractClasses;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System.Drawing;
 
