@@ -1,6 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using System.Drawing;
 using Dyhar.src.Mechanics;
 using System;
 
@@ -17,7 +16,7 @@ namespace Dyhar.src.Entities
         int JumpPower = 15;
         Reload multipleJumpsReload = new Reload("jump_reload", 10);
 
-        public Direction DirectionLook { get; set; }
+        public Direction DirectionLook { get; private set; }
         public MeleeWeapon CurrentWeapon { get; set; }
         public Reload attackAnimationReload = new Reload("attack_animation", 500);
 
@@ -30,10 +29,13 @@ namespace Dyhar.src.Entities
             IsSolid = false;
             DirectionLook = Direction.Right;
             CurrentWeapon = new Sword(this);
+            attackAnimationReload = new Reload("attack_animation", CurrentWeapon.AttackDuration);
         }
 
         public void MoveHorizontally(Direction direction)
         {
+            DirectionLook = direction;
+
             if (direction == Direction.Left)
                 Force.X -= (float)Speed;
             else if (direction == Direction.Right)
@@ -67,7 +69,6 @@ namespace Dyhar.src.Entities
         public override void onUpdate(GameTime gameTime)
         {
             CheckAllReloads(gameTime);
-            DirectionLook = (Force.X > 0) ? Direction.Right : Direction.Left;
         }
 
         public void CheckAllReloads(GameTime gameTime)
@@ -112,8 +113,8 @@ namespace Dyhar.src.Entities
         }
 
         public bool IsAttacking() => attackAnimationReload.State == ReloadState.Reloading;
-
         public MeleeWeapon GetCurrentWeapon() => CurrentWeapon;
         public Direction GetDirection() => DirectionLook;
+        public Reload GetReload() => attackAnimationReload;
     }
 }

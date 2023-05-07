@@ -52,6 +52,10 @@ namespace Dyhar
             for (var i = 10; i < 20; i++)
                 currentLevel.gameObjects.Add(new EarthBlock(i * 25, 600));
 
+            for (var i = 10; i < 20; i++)
+                for (var j = 0; j < 3; j++)
+                currentLevel.gameObjects.Add(new EarthBlock(i * 25, 1100 + 25 * j));
+
             base.Initialize();
         }
 
@@ -89,8 +93,6 @@ namespace Dyhar
                 gameObject.onUpdate(gameTime);
             }
 
-
-
             base.Update(gameTime);
         }
 
@@ -103,9 +105,11 @@ namespace Dyhar
             for (var i = 0; i < currentLevel.gameObjects.Count; i++)
             {
                 var gameObject = currentLevel.gameObjects[i];
-                _spriteBatch.Draw(gameObject.GetSprite(), gameObject.Position, Color.White);
+                gameObject.Draw(_spriteBatch);
+                foreach (var weaponUser in currentLevel.weaponUsers)
+                    if (weaponUser.IsAttacking())
+                        weaponUser.GetCurrentWeapon().Draw(_spriteBatch);
             }
-            _spriteBatch.Draw(Sword.sprite, new Vector2(50, 1140), Color.White);
             _spriteBatch.End();
 
             base.Draw(gameTime);

@@ -1,6 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using System.Drawing;
 
 namespace Dyhar.src.Entities;
 
@@ -9,7 +8,7 @@ public abstract class GameObject
     public double X { get; set; }
     public double Y { get; set; }
     public Vector2 Position { get => new Vector2((int)X, (int)Y); }
-    public Size SizeSprite { get => new Size(GetSprite().Width, GetSprite().Height); }
+    public System.Drawing.Size SizeSprite { get => new System.Drawing.Size(GetSprite().Width, GetSprite().Height); }
 
     public bool IsSolid { get; set; }
 
@@ -23,8 +22,8 @@ public abstract class GameObject
         return GameObject.CheckCollision(X, Y, SizeSprite, otherObject.X, otherObject.Y, otherObject.SizeSprite);
     }
 
-    public static bool CheckCollision(double firstObjectX, double firstObjectY, SizeF firstObjectSize,
-                                      double secondObjectX, double secondObjectY, SizeF secondObjectSize)
+    public static bool CheckCollision(double firstObjectX, double firstObjectY, System.Drawing.SizeF firstObjectSize,
+                                      double secondObjectX, double secondObjectY, System.Drawing.SizeF secondObjectSize)
     {
         // смотрим если первый прямоугольник левее второго
         var tooLeft = firstObjectX > secondObjectX + secondObjectSize.Width;
@@ -42,5 +41,10 @@ public abstract class GameObject
     public virtual void onAttacked(MeleeWeapon weapon)
     {
         return;
+    }
+
+    public virtual void Draw(SpriteBatch spriteBatch)
+    {
+        spriteBatch.Draw(GetSprite(), Position, Color.White);
     }
 }

@@ -21,6 +21,8 @@ public class Reload
     private TimeSpan CurrentTime { get; set; }
     private TimeSpan EndTime { get; set; }
 
+    public TimeSpan PassedTime { get =>  CurrentTime - StartTime; }
+
     private bool wasStartedWithoutTime = false;
 
     public Reload(string name)

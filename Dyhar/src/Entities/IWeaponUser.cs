@@ -10,4 +10,5 @@ public interface IWeaponUser
     public bool IsAttacking();
     public MeleeWeapon GetCurrentWeapon();
     public Direction GetDirection();
+    public Reload GetReload();
 }
