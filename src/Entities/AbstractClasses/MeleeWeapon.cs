@@ -19,6 +19,9 @@ public abstract class MeleeWeapon
 
     public bool CheckCollision(GameObject gameObject, Direction direction)
     {
+        if (gameObject == Attacker) 
+            return false;
+
         var attackPoint = Attacker.FindWeaponStart();
         if (direction == Direction.Right && attackPoint.X <= gameObject.X)
             return Math.Pow(gameObject.X - attackPoint.X, 2) + Math.Pow(gameObject.Y - attackPoint.Y, 2) <= WeaponLength * WeaponLength;

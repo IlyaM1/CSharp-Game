@@ -1,205 +1,198 @@
-﻿using Dyhar.src.Drawing;
-using Dyhar.src.Entities.AbstractClasses;
+﻿using Dyhar.src.Entities.AbstractClasses;
 using Dyhar.src.LevelsCreator;
+using Dyhar.src.Utils;
+using Microsoft.Xna.Framework;
 using System;
 using System.Collections.Generic;
-using System.Numerics;
 
 namespace Dyhar.src.Mechanics
 {
-    public sealed class Physic
+    public sealed class Physics
     {
         private Level level;
-        private double frictionСoefficient { get; set; }
         private double accelerationOfFreeFall { get; set; }
 
-        public Physic(Level level, double frictionСoefficient = 1, double accelerationOfFreeFall = 0.6)
+        public Physics(Level level, double accelerationOfFreeFall = 0.6)
         {
-            this.frictionСoefficient = frictionСoefficient;
             this.accelerationOfFreeFall = accelerationOfFreeFall;
             this.level = level;
         }
 
-        public void CheckObjectIsOnGround(MovingGameObject gameObject) 
+        public void Move(MovingGameObject gameObject)
         {
-            if (Resolution.etalonHeight - gameObject.Y == gameObject.SizeSprite.Height)
-            {
-                gameObject.onIsOnGround();
-                gameObject.IsOnGround = true;
-                return;
-            }
+            var allGameObjects = level.gameObjects;
+            NormallyMoveObject(gameObject);
 
-            foreach (var otherGameObject in GetSolidCollisionedGameObjects(gameObject))
+            var collisionedGameObjects = GetCollisionedObjects(gameObject, allGameObjects);
+            CallEventOnCollisionForAllCollisionedObjects(collisionedGameObjects, gameObject);
+
+            var solidCollisionedObjects = GetSolidCollisionedObjects(collisionedGameObjects);
+            if (solidCollisionedObjects.Count > 0)
             {
-                var bottomGameObject = gameObject.Y + gameObject.SizeSprite.Height;
-                if (bottomGameObject == otherGameObject.Y)
+                // Next steps if we moved and get collision
+                CancelObjectMove(gameObject);
+                foreach (var collisionObject in solidCollisionedObjects)
                 {
-                    gameObject.onIsOnGround();
-                    gameObject.IsOnGround = true;
-                    return;
+                    var direction = GetDirectionOfCollision(gameObject, collisionObject);
+                    MoveObjectClose(gameObject, collisionObject, direction); // Move object as close as it is possible
+
+                    if (direction == Direction.Up || direction == Direction.Down)
+                        gameObject.X += gameObject.Force.X; // Normally move horizontally if we are from up or from bottom
+                    if (direction == Direction.Left || direction == Direction.Right)
+                        gameObject.Y += gameObject.Force.Y; // Normally move horizontally if we are from up or from bottom
                 }
             }
 
-            gameObject.IsOnGround = false;
+            NormalizeObjectPosition(gameObject);
+            if (CheckIfObjectIsOnGround(gameObject))
+                WhenObjectOnGround(gameObject);
+            else
+                gameObject.IsOnGround = false;
+
+            gameObject.Force = CountForce(gameObject);
         }
 
-        public Vector2 CountForce(MovingGameObject gameObject)
+        private Direction GetDirectionOfCollision(MovingGameObject gameObject, GameObject collisionObject)
+        {
+            var previousState = new Vector2((float)gameObject.X, (float)gameObject.Y);
+            var nextState = new Vector2((float)(gameObject.X + gameObject.Force.X), (float)(gameObject.Y + gameObject.Force.Y));
+            var intersection = RectangleIntersection.GetIntersection(new Rectangle((int)nextState.X, (int)nextState.Y, gameObject.Size.Width, gameObject.Size.Height), collisionObject.Rectangle);
+
+            if (previousState.X <= collisionObject.X)
+                if (previousState.Y <= collisionObject.Y)
+                    if (intersection.Width < intersection.Height)
+                        return Direction.Left;
+                    else
+                        return Direction.Up;
+                else
+                    if (intersection.Width < intersection.Height)
+                        return Direction.Left;
+                    else
+                        return Direction.Down;
+            else
+                if (previousState.Y <= collisionObject.Y)
+                    if (intersection.Width < intersection.Height)
+                        return Direction.Right;
+                    else
+                        return Direction.Up;
+                else
+                    if (intersection.Width < intersection.Height)
+                        return Direction.Right;
+                    else
+                        return Direction.Down;
+        }
+
+        private void MoveObjectClose(MovingGameObject gameObject, GameObject collisionObject, Direction direction)
+        {
+            if (direction == Direction.Up)
+                gameObject.Y += collisionObject.Y - (gameObject.Y + gameObject.Size.Height);
+            else if (direction == Direction.Down)
+            {
+                gameObject.Y -= gameObject.Y - (collisionObject.Y + collisionObject.Size.Height);
+                gameObject.Force.Y = 0;
+            }
+            else if (direction == Direction.Left)
+                gameObject.X += collisionObject.X - (gameObject.X + gameObject.Size.Width);
+            else if (direction == Direction.Right)
+                gameObject.X -= gameObject.X - (collisionObject.X + collisionObject.Size.Width);
+            else
+            {
+                throw new Exception("Unknown direction");
+            }
+
+        }
+
+        private void NormallyMoveObject(MovingGameObject gameObject)
+        {
+            gameObject.X += gameObject.Force.X;
+            gameObject.Y += gameObject.Force.Y;
+        }
+
+        private void CancelObjectMove(MovingGameObject gameObject)
+        {
+            gameObject.X -= gameObject.Force.X;
+            gameObject.Y -= gameObject.Force.Y;
+        }
+
+        private List<GameObject> GetCollisionedObjects(MovingGameObject gameObject, List<GameObject> allGameObjects)
+        {
+            var list = new List<GameObject>();
+            foreach (var otherGameObject in allGameObjects)
+                if (gameObject.CheckCollision(otherGameObject))
+                    list.Add(otherGameObject);
+            return list;
+        }
+
+        private Vector2 CountForce(MovingGameObject gameObject)
         {
             var newForce = new Vector2();
-
             if (gameObject.IsOnGround)
                 newForce.Y = 0;
             else
                 newForce.Y = (float)(gameObject.Force.Y + accelerationOfFreeFall);
 
             newForce.X = 0;
-
             return newForce;
         }
 
-        public void Move(MovingGameObject gameObject)
+        private void CallEventOnCollisionForAllCollisionedObjects(List<GameObject> gameObjects, MovingGameObject collisionedGameObject)
         {
-            if (gameObject is null)
-                throw new ArgumentNullException();
-
-            // Move object and check if we get collision
-            gameObject.X += gameObject.Force.X;
-            gameObject.Y += gameObject.Force.Y;
-
-            var collisionedGameObjectList = GetCollisionedGameObjects(gameObject);
-            CallOnCollisionEventForAllCollisionedObjects(gameObject, collisionedGameObjectList);
-
-            if (!CanObjectBeMoved(collisionedGameObjectList))
+            foreach (var gameObject in gameObjects)
             {
-                if (!gameObject.IsOnGround)
-                {
-                    gameObject.X -= gameObject.Force.X;
-                    gameObject.Y -= gameObject.Force.Y;
-                    foreach (var collisionedGameObject in GetSolidCollisionedGameObjects(collisionedGameObjectList))
-                    {
-                        var directionOfCollision = FindDirectionOfCollision(gameObject, collisionedGameObject);
-                        MoveObjectCloseAsPossible(gameObject, collisionedGameObject, directionOfCollision);
-                        if (directionOfCollision == Direction.Left || directionOfCollision == Direction.Right)
-                            gameObject.Y += gameObject.Force.Y;
-                        else if (directionOfCollision == Direction.Up || directionOfCollision == Direction.Down)
-                        {
-                            gameObject.X += gameObject.Force.X;
-                            gameObject.Force.Y = 0;
-                        }
-                            
-                    }
-                }
-                else
-                {
-                    gameObject.Y -= gameObject.Force.Y;
-                }
+                gameObject.onCollision(collisionedGameObject);
+                collisionedGameObject.onCollision(gameObject);
             }
+        }
 
-            NormalizeObjectPosition(gameObject);
+        private List<GameObject> GetSolidCollisionedObjects(List<GameObject> collisionedGameObjects)
+        {
+            var list = new List<GameObject>();
+            foreach (var gameObject in collisionedGameObjects)
+                if (gameObject.IsSolid)
+                    list.Add(gameObject);
+            return list;
+        }
 
-            CheckObjectIsOnGround(gameObject);
-            gameObject.Force = CountForce(gameObject);
+        private void WhenObjectOnGround(MovingGameObject gameObject)
+        {
+            gameObject.IsOnGround = true;
+            gameObject.onIsOnGround();
+        }
+
+        private bool CheckIfObjectIsOnGround(MovingGameObject gameObject)
+        {
+            if (gameObject.Y + gameObject.Size.Height == level.Height)
+                return true;
+
+            foreach (var otherGameObject in level.gameObjects)
+                if (otherGameObject.IsSolid)
+                    if (gameObject.Y + gameObject.Size.Height == otherGameObject.Y
+                        && gameObject.X + gameObject.Size.Width >= otherGameObject.X
+                        && gameObject.X <= otherGameObject.X + otherGameObject.Size.Width)
+                        return true;
+
+            return false;
         }
 
         private void NormalizeObjectPosition(MovingGameObject gameObject)
         {
-            if (gameObject.Y + gameObject.SizeSprite.Height >= level.Height)
+            if (gameObject.Y + gameObject.Size.Height > level.Height)
             {
-                gameObject.Y = level.Height - gameObject.SizeSprite.Height;
+                gameObject.Y = level.Height - gameObject.Size.Height;
                 gameObject.Force.Y = 0;
             }
 
-            if (gameObject.Y <= 0)
+            if (gameObject.Y < 0)
             {
                 gameObject.Force.Y = 0;
                 gameObject.Y = 0;
             }
 
-            if (gameObject.X <= 0)
+            if (gameObject.X < 0)
                 gameObject.X = 0;
 
-            if (gameObject.X + gameObject.SizeSprite.Width >= level.Width)
-                gameObject.X = level.Width - gameObject.SizeSprite.Width;  
-        }
-
-        public Direction FindDirectionOfCollision(MovingGameObject gameObject, GameObject collisionedGameObject)
-        {
-            var bottomGameObject = gameObject.Y + gameObject.SizeSprite.Height;
-            if (bottomGameObject <= collisionedGameObject.Y)
-                return Direction.Up;
-
-            var bottomOtherGameObject = collisionedGameObject.Y + collisionedGameObject.SizeSprite.Height;
-            if (gameObject.Y >= bottomOtherGameObject)
-                return Direction.Down;
-
-            var rightPartGameObject = gameObject.X + gameObject.SizeSprite.Width;
-            if (collisionedGameObject.X >= rightPartGameObject)
-                return Direction.Left;
-
-            var rightPartOtherGameObject = collisionedGameObject.X + collisionedGameObject.SizeSprite.Width;
-            if (gameObject.X >= rightPartOtherGameObject)
-                return Direction.Right;
-
-            return Direction.Left;
-        }
-
-        public void MoveObjectCloseAsPossible(MovingGameObject gameObject, GameObject collisionedGameObject, Direction directionOfCollision)
-        {
-            if (directionOfCollision == Direction.Left)
-                gameObject.X += (collisionedGameObject.X - (gameObject.X + gameObject.SizeSprite.Width));
-
-            else if (directionOfCollision == Direction.Right)
-                gameObject.X -= (gameObject.X - (collisionedGameObject.X + collisionedGameObject.SizeSprite.Width));
-
-            else if (directionOfCollision == Direction.Up)
-                gameObject.Y += (collisionedGameObject.Y - (gameObject.Y + gameObject.SizeSprite.Height));
-
-            else if (directionOfCollision == Direction.Down)
-                gameObject.Y -= (gameObject.Y - (collisionedGameObject.Y + collisionedGameObject.SizeSprite.Height));
-        }
-
-        public bool CanObjectBeMoved(List<GameObject> gameObjectList)
-        {
-            foreach (var gameObject in gameObjectList)
-                if (gameObject.IsSolid)
-                    return false;
-            return true;
-        }
-
-        public List<GameObject> GetCollisionedGameObjects(GameObject gameObject)
-        {
-            var collisionedGameObjects = new List<GameObject>();
-
-            foreach (var otherGameObject in level.gameObjects)
-                if (gameObject.CheckCollision(otherGameObject))
-                    collisionedGameObjects.Add(otherGameObject);
-
-            return collisionedGameObjects;
-        }
-
-        public List<GameObject> GetSolidCollisionedGameObjects(List<GameObject> gameObjectList)
-        {
-            var solidObjectsList = new List<GameObject>();
-            foreach(var gameObject in gameObjectList)
-                if (gameObject.IsSolid)
-                    solidObjectsList.Add(gameObject);
-            return solidObjectsList;
-        }
-
-        public List<GameObject> GetSolidCollisionedGameObjects(GameObject gameObject)
-        {
-            var solidObjectsList = new List<GameObject>();
-            foreach (var otherGameObject in GetCollisionedGameObjects(gameObject))
-                if (otherGameObject.IsSolid)
-                    solidObjectsList.Add(otherGameObject);
-            return solidObjectsList;
-        }
-
-        public void CallOnCollisionEventForAllCollisionedObjects(GameObject checkablegameObject, List<GameObject> gameObjectList)
-        {
-            foreach (var gameObject in gameObjectList)
-                if (gameObject.IsSolid)
-                    gameObject.onCollision(checkablegameObject);
+            if (gameObject.X + gameObject.Size.Width > level.Width)
+                gameObject.X = level.Width - gameObject.Size.Width;
         }
     }
 }

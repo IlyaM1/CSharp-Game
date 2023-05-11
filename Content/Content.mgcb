@@ -68,7 +68,7 @@
 /processorParam:TextureFormat=Color
 /build:Sword.png
 
-#begin Sword.png
+#begin Swordsman.png
 /importer:TextureImporter
 /processor:TextureProcessor
 /processorParam:ColorKeyColor=255,0,255,255
@@ -78,5 +78,5 @@
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
-/build:Sword.png
+/build:Swordsman.png
 

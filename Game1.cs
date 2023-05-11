@@ -10,6 +10,7 @@ using Dyhar.src.Utils;
 using System.Linq;
 using Dyhar.src.Drawing;
 using Dyhar.src.Entities.AbstractClasses;
+using System;
 
 namespace Dyhar
 {
@@ -32,7 +33,12 @@ namespace Dyhar
 
             Content.RootDirectory = "Content";
             IsMouseVisible = true;
+
+            //this.IsFixedTimeStep = true;//false;
+            //this.TargetElapsedTime = TimeSpan.FromSeconds(1d / 30d); //60);
         }
+
+        // public static GraphicsDevice GetGraphicsDevice() => _graphics.GraphicsDevice;
 
         protected override void Initialize()
         {
@@ -40,21 +46,12 @@ namespace Dyhar
             _graphics.PreferredBackBufferWidth = Resolution.actualWidth;
             _graphics.PreferredBackBufferHeight = Resolution.actualHeight;
             _graphics.ApplyChanges();
-
             LoadContent();
 
             player = new Player(0, 0);
             control.SetPlayer(player);
 
-            currentLevel = new Level(new[] {(GameObject)player}.ToList());
-            currentLevel.weaponUsers.Add(player);
-
-            for (var i = 10; i < 20; i++)
-                currentLevel.gameObjects.Add(new EarthBlock(i * 25, 600));
-
-            for (var i = 10; i < 20; i++)
-                for (var j = 0; j < 3; j++)
-                currentLevel.gameObjects.Add(new EarthBlock(i * 25, 1100 + 25 * j));
+            currentLevel = Level.CreateTestLevel(player);
 
             base.Initialize();
         }
@@ -66,6 +63,7 @@ namespace Dyhar
             Player.sprite = Content.Load<Texture2D>("player");
             EarthBlock.sprite = Content.Load<Texture2D>("Earth2");
             Sword.sprite = Content.Load<Texture2D>("Sword");
+            Swordsman.sprite = Content.Load<Texture2D>("Swordsman");
 
             standardFont = Content.Load<SpriteFont>("galleryFont");
 

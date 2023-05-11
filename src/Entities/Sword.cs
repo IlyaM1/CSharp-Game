@@ -13,7 +13,7 @@ namespace Dyhar.src.Entities
 
         public Sword(IWeaponUser attacker) : base(attacker) { }
 
-        public override int WeaponLength { get => sprite.Width + 15; }
+        public override int WeaponLength { get => sprite.Width + 30; }
 
         public override Texture2D GetSprite() => sprite;
 

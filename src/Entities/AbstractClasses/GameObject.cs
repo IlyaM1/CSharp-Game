@@ -1,5 +1,8 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using System.Drawing;
+using Color = Microsoft.Xna.Framework.Color;
+using Rectangle = Microsoft.Xna.Framework.Rectangle;
 
 namespace Dyhar.src.Entities.AbstractClasses;
 
@@ -8,7 +11,10 @@ public abstract class GameObject
     public double X { get; set; }
     public double Y { get; set; }
     public Vector2 Position { get => new Vector2((int)X, (int)Y); }
-    public System.Drawing.Size SizeSprite { get => new System.Drawing.Size(GetSprite().Width, GetSprite().Height); }
+    public virtual Size Size { get => new Size(GetSprite().Width, GetSprite().Height); }
+    public Rectangle Rectangle { get => new Rectangle((int)X, (int)Y, Size.Width, Size.Height); }
+    public int Width => Size.Width;
+    public int Height => Size.Height;
 
     public bool IsSolid { get; set; }
 
@@ -19,23 +25,18 @@ public abstract class GameObject
 
     public virtual bool CheckCollision(GameObject otherObject)
     {
-        return CheckCollision(X, Y, SizeSprite, otherObject.X, otherObject.Y, otherObject.SizeSprite);
+        return CheckCollision(X, Y, Size, otherObject.X, otherObject.Y, otherObject.Size);
     }
 
-    public static bool CheckCollision(double firstObjectX, double firstObjectY, System.Drawing.SizeF firstObjectSize,
-                                      double secondObjectX, double secondObjectY, System.Drawing.SizeF secondObjectSize)
+    public static bool CheckCollision(double firstObjectX, double firstObjectY, SizeF firstObjectSize,
+        double secondObjectX, double secondObjectY, SizeF secondObjectSize)
     {
-        // смотрим если первый прямоугольник левее второго
-        var tooLeft = firstObjectX > secondObjectX + secondObjectSize.Width;
-        // смотрим если первый прямоугольник правее второго
-        var tooRight = secondObjectX > firstObjectX + firstObjectSize.Width;
-        // смотрим если первый прямоугольник выше второго
-        var tooHigh = firstObjectY > secondObjectY + secondObjectSize.Height;
-        // смотрим если первый прямоугольник ниже второго
-        var tooLow = secondObjectY > firstObjectY + firstObjectSize.Height;
+        var isCollisionFromLeft = firstObjectX + firstObjectSize.Width > secondObjectX;
+        var isCollisionFromRight = firstObjectX < secondObjectX + secondObjectSize.Width;
+        var isCollisionFromUp = firstObjectY + firstObjectSize.Height > secondObjectY;
+        var isCollisionFromBottom = firstObjectY < secondObjectY + secondObjectSize.Height;
 
-        // если ни одно из условий непересечения не сработало, значит они перескаются
-        return !(tooLeft || tooRight || tooHigh || tooLow);
+        return isCollisionFromLeft && isCollisionFromRight && isCollisionFromUp && isCollisionFromBottom;
     }
 
     public virtual void onAttacked(MeleeWeapon weapon)

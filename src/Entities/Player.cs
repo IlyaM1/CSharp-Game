@@ -7,7 +7,7 @@ using Dyhar.src.Entities.AbstractClasses;
 
 namespace Dyhar.src.Entities
 {
-    public class Player : MovingGameObject, IWeaponUser
+    public class Player : MovingGameObject, IWarrior, IWeaponUser
     {
         public static Texture2D sprite;
 
@@ -22,6 +22,9 @@ namespace Dyhar.src.Entities
         public MeleeWeapon CurrentWeapon { get; set; }
         public Reload attackAnimationReload = new Reload("attack_animation", 500);
 
+        private double maxHealthPoints = 100.0;
+        private double currentHealthPoints = 100.0;
+
         public Player(int x, int y)
         {
             X = x; 
@@ -32,6 +35,7 @@ namespace Dyhar.src.Entities
             DirectionLook = Direction.Right;
             CurrentWeapon = new Sword(this);
             attackAnimationReload = new Reload("attack_animation", CurrentWeapon.AttackDuration);
+            currentHealthPoints = maxHealthPoints;
         }
 
         public void MoveHorizontally(Direction direction)
@@ -102,9 +106,9 @@ namespace Dyhar.src.Entities
         public Vector2 FindWeaponStart()
         {
             if (DirectionLook == Direction.Right)
-                return new Vector2((float)(X + SizeSprite.Width), (float)(Y + (SizeSprite.Height / 2)));
+                return new Vector2((float)(X + Size.Width), (float)(Y + (Size.Height / 2)));
             if (DirectionLook == Direction.Left)
-                return new Vector2((float)(X), (float)(Y + (SizeSprite.Height / 2)));
+                return new Vector2((float)(X), (float)(Y + (Size.Height / 2)));
 
             throw new Exception("Impossible Direction");
         }
@@ -118,5 +122,6 @@ namespace Dyhar.src.Entities
         public MeleeWeapon GetCurrentWeapon() => CurrentWeapon;
         public Direction GetDirection() => DirectionLook;
         public Reload GetReload() => attackAnimationReload;
+        public double GetCurrentHp() => currentHealthPoints;
     }
 }
