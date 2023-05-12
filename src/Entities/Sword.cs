@@ -11,9 +11,12 @@ namespace Dyhar.src.Entities
     {
         public static Texture2D sprite;
 
-        public Sword(IWeaponUser attacker) : base(attacker) { }
+        public Sword(IWeaponUser attacker) : base(attacker)
+        {
+            AttackDuration = 1500;
+        }
 
-        public override int WeaponLength { get => sprite.Width + 30; }
+        public override int WeaponLength { get => sprite.Width + 5; }
 
         public override Texture2D GetSprite() => sprite;
 

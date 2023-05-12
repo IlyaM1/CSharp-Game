@@ -25,7 +25,7 @@ namespace Dyhar.src.Mechanics
 
             var collisionedGameObjects = GetCollisionedObjects(gameObject, allGameObjects);
             CallEventOnCollisionForAllCollisionedObjects(collisionedGameObjects, gameObject);
-
+                
             var solidCollisionedObjects = GetSolidCollisionedObjects(collisionedGameObjects);
             if (solidCollisionedObjects.Count > 0)
             {

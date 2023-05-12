@@ -10,25 +10,41 @@ public abstract class MeleeWeapon
 {
     public IWeaponUser Attacker { get; private set; }
     public abstract int WeaponLength { get; }
-    public readonly int AttackDuration = 250; // Adjust this value to control the animation speed
+    public int AttackDuration { get; protected set; }
 
     public MeleeWeapon(IWeaponUser attacker)
     {
         Attacker = attacker;
+        AttackDuration = 250;
     }
 
     public bool CheckCollision(GameObject gameObject, Direction direction)
     {
-        if (gameObject == Attacker) 
+        if (gameObject == Attacker)
             return false;
 
         var attackPoint = Attacker.FindWeaponStart();
-        if (direction == Direction.Right && attackPoint.X <= gameObject.X)
-            return Math.Pow(gameObject.X - attackPoint.X, 2) + Math.Pow(gameObject.Y - attackPoint.Y, 2) <= WeaponLength * WeaponLength;
-        else if (direction == Direction.Left && attackPoint.X >= gameObject.X)
-            return Math.Pow(attackPoint.X - gameObject.X, 2) + Math.Pow(attackPoint.Y - gameObject.Y, 2) <= WeaponLength * WeaponLength;
+
+        if ((direction == Direction.Right && attackPoint.X <= gameObject.X) 
+            || (direction == Direction.Left && attackPoint.X >= gameObject.X))
+            return IntersectsCircleRectangle(attackPoint, WeaponLength, gameObject.Rectangle);
 
         return false;
+    }
+
+    public bool IntersectsCircleRectangle(Vector2 circleCenter, float radius, Rectangle rectangle)
+    {
+        var clampedX = Math.Max(rectangle.Left, Math.Min(circleCenter.X, rectangle.Right));
+        var clampedY = Math.Max(rectangle.Top, Math.Min(circleCenter.Y, rectangle.Bottom));
+        var distanceX = circleCenter.X - clampedX;
+        var distanceY = circleCenter.Y - clampedY;
+        var distanceSq = distanceX * distanceX + distanceY * distanceY;
+        var radiusSq = radius * radius;
+
+        return (distanceSq <= radiusSq) || (
+            (circleCenter.X >= rectangle.Left && circleCenter.X <= rectangle.Right) &&
+            (circleCenter.Y >= rectangle.Top && circleCenter.Y <= rectangle.Bottom)
+        );
     }
 
     public abstract Texture2D GetSprite();
