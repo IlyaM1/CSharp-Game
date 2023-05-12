@@ -7,11 +7,7 @@ namespace Dyhar.src.Entities;
 public class EarthBlock : GameObject
 {
     public static Texture2D sprite;
-    private int width;
-    private int height;
-
     public override System.Drawing.Size Size => new System.Drawing.Size(width, height);
-    private Texture2D ownSprite;
 
     public EarthBlock(int x, int y, int width, int height)
     {
@@ -47,6 +43,11 @@ public class EarthBlock : GameObject
 
         base.Draw(spriteBatch);
     }
+
+    private int width;
+    private int height;
+
+    private Texture2D ownSprite;
 
     private Texture2D GetSpriteForThisSize(SpriteBatch spriteBatch)
     {

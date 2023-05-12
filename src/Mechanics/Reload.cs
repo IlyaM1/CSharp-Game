@@ -13,47 +13,15 @@ public enum ReloadState
 public class Reload
 {
     public string Name { get; private set; }
-
-    public ReloadState State { get; set; }
+    public ReloadState State { get; private set; }
     public int ReloadTimeInMilliseconds { get; set; }
-
-    private TimeSpan StartTime { get; set; }
-    private TimeSpan CurrentTime { get; set; }
-    private TimeSpan EndTime { get; set; }
-
-    public TimeSpan PassedTime { get =>  CurrentTime - StartTime; }
-
-    private bool wasStartedWithoutTime = false;
-
-    public Reload(string name)
-    {
-        Name = name;
-        State = ReloadState.NotStarted;
-    }
+    public TimeSpan PassedTime => CurrentTime - StartTime;
 
     public Reload(string name, int reloadTimeInMilliseconds)
     {
         Name = name;
         ReloadTimeInMilliseconds = reloadTimeInMilliseconds;
         State = ReloadState.NotStarted;
-    }
-
-    public void Start(GameTime gameTime)
-    {
-        if (State != ReloadState.NotStarted)
-            return;
-
-        StartTime = gameTime.TotalGameTime;
-        if (ReloadTimeInMilliseconds == 0)
-            throw new ArgumentException();
-        EndTime = StartTime + new TimeSpan(0, 0, 0, ReloadTimeInMilliseconds / 1000, ReloadTimeInMilliseconds % 1000);
-        State = ReloadState.Reloading;
-    }
-
-    public void Start(GameTime gameTime, int reloadTimeInMilliseconds)
-    {
-        ReloadTimeInMilliseconds = reloadTimeInMilliseconds;
-        Start(gameTime);
     }
 
     public void Start()
@@ -84,5 +52,23 @@ public class Reload
     public void CompletedFinishedCheck()
     {
         State = ReloadState.NotStarted;
+    }
+
+    private TimeSpan StartTime { get; set; }
+    private TimeSpan CurrentTime { get; set; }
+    private TimeSpan EndTime { get; set; }
+
+    private bool wasStartedWithoutTime = false;
+
+    private void Start(GameTime gameTime)
+    {
+        if (State != ReloadState.NotStarted)
+            return;
+
+        StartTime = gameTime.TotalGameTime;
+        if (ReloadTimeInMilliseconds == 0)
+            throw new ArgumentException();
+        EndTime = StartTime + new TimeSpan(0, 0, 0, ReloadTimeInMilliseconds / 1000, ReloadTimeInMilliseconds % 1000);
+        State = ReloadState.Reloading;
     }
 }

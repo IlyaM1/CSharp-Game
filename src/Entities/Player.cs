@@ -10,31 +10,20 @@ namespace Dyhar.src.Entities
     public class Player : MovingGameObject, IWarrior, IWeaponUser
     {
         public static Texture2D sprite;
-
-        bool IsInJump = false;
-
-        int numberOfExtraJumps = 1;
-        int maxNumberOfExtraJumps = 3;
-        int JumpPower = 15;
-        Reload multipleJumpsReload = new Reload("jump_reload", 10);
-
         public Direction DirectionLook { get; private set; }
-        public MeleeWeapon CurrentWeapon { get; set; }
-        public Reload attackAnimationReload = new Reload("attack_animation", 500);
-
-        private double maxHealthPoints = 100.0;
-        private double currentHealthPoints = 100.0;
+        public MeleeWeapon CurrentWeapon { get; private set; }
+        public Reload AttackAnimationReload { get; private set; }
 
         public Player(int x, int y)
         {
             X = x; 
             Y = y;
-            Speed = 10.0;
+            Speed = 10.0f;
             Force = new Vector2(0, 0);
             IsSolid = false;
             DirectionLook = Direction.Right;
             CurrentWeapon = new Sword(this);
-            attackAnimationReload = new Reload("attack_animation", CurrentWeapon.AttackDuration);
+            AttackAnimationReload = new Reload("attack_animation", CurrentWeapon.AttackDuration);
             currentHealthPoints = maxHealthPoints;
         }
 
@@ -77,25 +66,6 @@ namespace Dyhar.src.Entities
             CheckAllReloads(gameTime);
         }
 
-        public void CheckAllReloads(GameTime gameTime)
-        {
-            multipleJumpsReload.OnUpdate(gameTime);
-            if (multipleJumpsReload.State == ReloadState.Finished)
-            {
-                if (numberOfExtraJumps < maxNumberOfExtraJumps)
-                {
-                    numberOfExtraJumps += 1;
-                    multipleJumpsReload.CompletedFinishedCheck();
-                    if (numberOfExtraJumps < maxNumberOfExtraJumps)
-                        multipleJumpsReload.Start();
-                }
-            }
-
-            attackAnimationReload.OnUpdate(gameTime);
-            if (attackAnimationReload.State == ReloadState.Finished)
-                attackAnimationReload.CompletedFinishedCheck();
-        }
-
         public override Texture2D GetSprite() => sprite;
 
         public override void onCollision(GameObject collisionObject)
@@ -115,13 +85,44 @@ namespace Dyhar.src.Entities
 
         public void onAttack()
         {
-            attackAnimationReload.Start();
+            AttackAnimationReload.Start();
         }
 
-        public bool IsAttacking() => attackAnimationReload.State == ReloadState.Reloading;
+        public bool IsAttacking() => AttackAnimationReload.State == ReloadState.Reloading;
         public MeleeWeapon GetCurrentWeapon() => CurrentWeapon;
         public Direction GetDirection() => DirectionLook;
-        public Reload GetReload() => attackAnimationReload;
+        public Reload GetReload() => AttackAnimationReload;
         public double GetCurrentHp() => currentHealthPoints;
+
+
+
+
+        bool IsInJump = false;
+        int numberOfExtraJumps = 1;
+        int maxNumberOfExtraJumps = 3;
+        int JumpPower = 15;
+
+        Reload multipleJumpsReload = new Reload("jump_reload", 10);
+        double maxHealthPoints = 100.0;
+        double currentHealthPoints = 100.0;
+
+        private void CheckAllReloads(GameTime gameTime)
+        {
+            multipleJumpsReload.OnUpdate(gameTime);
+            if (multipleJumpsReload.State == ReloadState.Finished)
+            {
+                if (numberOfExtraJumps < maxNumberOfExtraJumps)
+                {
+                    numberOfExtraJumps += 1;
+                    multipleJumpsReload.CompletedFinishedCheck();
+                    if (numberOfExtraJumps < maxNumberOfExtraJumps)
+                        multipleJumpsReload.Start();
+                }
+            }
+
+            AttackAnimationReload.OnUpdate(gameTime);
+            if (AttackAnimationReload.State == ReloadState.Finished)
+                AttackAnimationReload.CompletedFinishedCheck();
+        }
     }
 }

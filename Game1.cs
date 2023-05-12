@@ -16,8 +16,8 @@ namespace Dyhar
 {
     public class Dyhar : Game
     {
-        private GraphicsDeviceManager _graphics;
-        private SpriteBatch _spriteBatch;
+        GraphicsDeviceManager _graphics;
+        SpriteBatch _spriteBatch;
         SpriteFont standardFont;
 
         Player player;
@@ -37,8 +37,6 @@ namespace Dyhar
             //this.IsFixedTimeStep = true;//false;
             //this.TargetElapsedTime = TimeSpan.FromSeconds(1d / 30d); //60);
         }
-
-        // public static GraphicsDevice GetGraphicsDevice() => _graphics.GraphicsDevice;
 
         protected override void Initialize()
         {
@@ -77,11 +75,11 @@ namespace Dyhar
 
             control.onUpdate(Mouse.GetState(), Keyboard.GetState());
 
-            for (var i = 0; i < currentLevel.gameObjects.Count; i++)
+            for (var i = 0; i < currentLevel.GameObjects.Count; i++)
             {
-                var gameObject = currentLevel.gameObjects[i];
+                var gameObject = currentLevel.GameObjects[i];
                 if (TypesUtils.CanBeDownCasted<GameObject, MovingGameObject>(gameObject))
-                    currentLevel.physic.Move((MovingGameObject)gameObject);
+                    currentLevel.Physics.Move((MovingGameObject)gameObject);
 
                 foreach (var weaponUser in currentLevel.weaponUsers)
                     if (weaponUser.IsAttacking())
@@ -100,9 +98,9 @@ namespace Dyhar
 
             camera.Update(player.Position, currentLevel.Width, currentLevel.Height);
             _spriteBatch.Begin(transformMatrix: camera.Transform);
-            for (var i = 0; i < currentLevel.gameObjects.Count; i++)
+            for (var i = 0; i < currentLevel.GameObjects.Count; i++)
             {
-                var gameObject = currentLevel.gameObjects[i];
+                var gameObject = currentLevel.GameObjects[i];
                 gameObject.Draw(_spriteBatch);
                 foreach (var weaponUser in currentLevel.weaponUsers)
                     if (weaponUser.IsAttacking())

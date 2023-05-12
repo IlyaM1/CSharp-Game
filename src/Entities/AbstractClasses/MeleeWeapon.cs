@@ -32,7 +32,10 @@ public abstract class MeleeWeapon
         return false;
     }
 
-    public bool IntersectsCircleRectangle(Vector2 circleCenter, float radius, Rectangle rectangle)
+    public abstract Texture2D GetSprite();
+    public abstract void Draw(SpriteBatch spriteBatch);
+
+    private bool IntersectsCircleRectangle(Vector2 circleCenter, float radius, Rectangle rectangle)
     {
         var clampedX = Math.Max(rectangle.Left, Math.Min(circleCenter.X, rectangle.Right));
         var clampedY = Math.Max(rectangle.Top, Math.Min(circleCenter.Y, rectangle.Bottom));
@@ -46,7 +49,4 @@ public abstract class MeleeWeapon
             (circleCenter.Y >= rectangle.Top && circleCenter.Y <= rectangle.Bottom)
         );
     }
-
-    public abstract Texture2D GetSprite();
-    public abstract void Draw(SpriteBatch spriteBatch);
 }

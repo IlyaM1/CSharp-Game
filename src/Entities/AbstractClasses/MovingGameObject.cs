@@ -5,7 +5,7 @@ namespace Dyhar.src.Entities.AbstractClasses
     public abstract class MovingGameObject : GameObject
     {
         public Vector2 Force;
-        public double Speed { get; set; }
+        public float Speed { get; set; }
         public bool IsOnGround { get; set; }
 
         public abstract void onIsOnGround();

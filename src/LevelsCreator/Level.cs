@@ -9,18 +9,19 @@ namespace Dyhar.src.LevelsCreator
 {
     public class Level
     {
-        public List<GameObject> gameObjects = new List<GameObject>();
-        public List<IWeaponUser> weaponUsers = new List<IWeaponUser>();
-        public Physics physic;
+        public List<GameObject> GameObjects { get; set; }
+        public List<IWeaponUser> weaponUsers { get; set; }
+        public Physics Physics { get; private set; }
 
-        public int Width { get; set; }
-        public int Height { get; set; }
+        public int Width { get; private set; }
+        public int Height { get; private set; }
 
-        public Level(List<GameObject> gameObjects, double frictionСoefficient = 1, double accelerationOfFreeFall = 0.5)
+        public Level(List<GameObject> gameObjects, List<IWeaponUser> weaponUsers)
         {
-            this.gameObjects = gameObjects;
+            this.GameObjects = gameObjects;
+            this.weaponUsers = weaponUsers;
 
-            physic = new Physics(this);
+            Physics = new Physics(this);
 
             Width = 2000;
             Height = 1200;
@@ -28,11 +29,10 @@ namespace Dyhar.src.LevelsCreator
 
         public static Level CreateTestLevel(Player player)
         {
-            var currentLevel = new Level(new[] { (GameObject)player }.ToList());
-            currentLevel.weaponUsers.Add(player);
+            var currentLevel = new Level(new[] { (GameObject)player }.ToList(), new[] { (IWeaponUser)player}.ToList());
 
-            currentLevel.gameObjects.Add(new EarthBlock(250, 600, 250, 50));
-            currentLevel.gameObjects.Add(new EarthBlock(250, 1000, 250, 200));
+            currentLevel.GameObjects.Add(new EarthBlock(250, 600, 250, 50));
+            currentLevel.GameObjects.Add(new EarthBlock(250, 1000, 250, 200));
 
             return currentLevel;
         }
