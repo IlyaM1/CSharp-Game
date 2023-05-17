@@ -31,11 +31,6 @@ public class EarthBlock : GameObject
         return;
     }
 
-    public override void onAttacked(MeleeWeapon weapon)
-    {
-        Y -= 50;
-    }
-
     public override void Draw(SpriteBatch spriteBatch)
     {
         if (ownSprite == null)

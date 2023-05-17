@@ -1,4 +1,6 @@
 ﻿using Dyhar.src.Entities.AbstractClasses;
+using Dyhar.src.Entities.Interfaces;
+using Dyhar.src.Mechanics;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System.Collections;
@@ -10,19 +12,24 @@ internal class Path
     public Queue path = new Queue();
 }
 
-public class Swordsman : Enemy
+public class Swordsman : Enemy, IWeaponUser
 {
-    public static Texture2D sprite;
-
-    private double maxHealthPoints = 100.0;
-    private double currentHealthPoints = 100.0;
-
-    private Path currentPath;
-
-    public Swordsman(int x, int y)
+    
+    Path FindPathToPlayer(Player player)
     {
-        X = x;
-        Y = y;
+        return new Path();
+    }
+
+    void MoveWithPath()
+    {
+        if (currentPath is null)
+            return;
+    }
+
+    public override void onPlayerScreen(Player player)
+    {
+        var path = FindPathToPlayer(player);
+        return;
     }
 
     public override void onCollision(GameObject collisionObject)
@@ -35,28 +42,51 @@ public class Swordsman : Enemy
         return;
     }
 
-    public override void onPlayerScreen(Player player)
-    {
-        var path = FindPathToPlayer(player);
-        return;
-    }
+    
 
     public override void onUpdate(GameTime gameTime)
     {
-        MoveWithPath();
+        CheckAllReloads(gameTime);
+
+        if (attackAnimationReload.State == ReloadState.NotStarted)
+            onAttack();
+    }
+
+    public static Texture2D sprite;
+
+    private Path currentPath;
+
+    public Swordsman(int x, int y) : base(x, y)
+    {
+        sword = new Sword(this);
+        sword.AttackDuration = 1500;
+        attackAnimationReload = new Reload(sword.AttackDuration);
     }
 
     public override Texture2D GetSprite() => sprite;
     public override double GetCurrentHp() => currentHealthPoints;
 
-    Path FindPathToPlayer(Player player)
+    public Vector2 FindWeaponStart()
     {
-        return new Path();
+        return new Vector2(X + 20, Y + 20);
     }
 
-    void MoveWithPath()
+    public void onAttack()
     {
-        if (currentPath is null)
-            return;
+        sword.onAttack();
+        attackAnimationReload.Start();
+    }
+
+    private Direction direction = Direction.Left;
+    private MeleeWeapon sword;
+    private Reload attackAnimationReload;
+
+    public MeleeWeapon GetCurrentWeapon() => sword;
+    public Direction GetDirection() => direction;
+    public Reload GetAnimationReload() => attackAnimationReload;
+
+    void CheckAllReloads(GameTime gameTime)
+    {
+        attackAnimationReload.OnUpdate(gameTime);
     }
 }

@@ -19,5 +19,10 @@ namespace Dyhar.src.Utils
         {
             return obj.GetType().GetProperty(staticFieldName).GetValue(obj);
         }
+
+        public static void EmptyFunction()
+        {
+
+        }
     }
 }

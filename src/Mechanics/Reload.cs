@@ -1,6 +1,8 @@
 ﻿using Microsoft.Xna.Framework;
 using System;
 
+using Dyhar.src.Utils;
+
 namespace Dyhar.src.Mechanics;
 
 public enum ReloadState
@@ -12,16 +14,21 @@ public enum ReloadState
 
 public class Reload
 {
-    public string Name { get; private set; }
     public ReloadState State { get; private set; }
     public int ReloadTimeInMilliseconds { get; set; }
     public TimeSpan PassedTime => CurrentTime - StartTime;
 
-    public Reload(string name, int reloadTimeInMilliseconds)
+    public Reload(int reloadTimeInMilliseconds)
     {
-        Name = name;
         ReloadTimeInMilliseconds = reloadTimeInMilliseconds;
         State = ReloadState.NotStarted;
+        finishAction = TypesUtils.EmptyFunction;
+    }
+
+    public Reload(int reloadTimeInMilliseconds, Action finishAction) 
+        : this(reloadTimeInMilliseconds)
+    {
+        this.finishAction = finishAction;
     }
 
     public void Start()
@@ -43,15 +50,12 @@ public class Reload
             if (CurrentTime > EndTime)
                 State = ReloadState.Finished;
         }
-    }
 
-    /// <summary> 
-	/// Changing state to NotStarted if was maken action that should be called after finishing this reload.
-    /// Not necessary but desirable.
-	/// </summary>
-    public void CompletedFinishedCheck()
-    {
-        State = ReloadState.NotStarted;
+        if (State == ReloadState.Finished)
+        {
+            finishAction();
+            State = ReloadState.NotStarted;
+        }
     }
 
     private TimeSpan StartTime { get; set; }
@@ -59,6 +63,7 @@ public class Reload
     private TimeSpan EndTime { get; set; }
 
     private bool wasStartedWithoutTime = false;
+    private Action finishAction;
 
     private void Start(GameTime gameTime)
     {

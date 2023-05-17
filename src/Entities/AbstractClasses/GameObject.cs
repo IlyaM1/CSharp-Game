@@ -16,7 +16,7 @@ public abstract class GameObject
     public Rectangle Rectangle => new Rectangle((int)X, (int)Y, Size.Width, Size.Height);
     public int Width => Size.Width;
     public int Height => Size.Height;
-
+    public bool IsAlive { get => isAlive; protected set { isAlive = value; } }
 
     public bool IsSolid { get; protected set; }
 
@@ -34,10 +34,17 @@ public abstract class GameObject
         return;
     }
 
+    public virtual void onDeath()
+    {
+        IsAlive = false;
+    }
+
     public virtual void Draw(SpriteBatch spriteBatch)
     {
         spriteBatch.Draw(GetSprite(), Position, Color.White);
     }
+
+    private bool isAlive = true;
 
     private bool CheckCollision(double firstObjectX, double firstObjectY, SizeF firstObjectSize,
         double secondObjectX, double secondObjectY, SizeF secondObjectSize)

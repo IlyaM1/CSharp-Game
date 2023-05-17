@@ -11,7 +11,10 @@ public class Sword : MeleeWeapon
 {
     public static Texture2D sprite;
 
-    public Sword(IWeaponUser attacker) : base(attacker) { }
+    public Sword(IWeaponUser attacker) : base(attacker)
+    {
+        Damage = 35;
+    }
 
     public override int WeaponLength => sprite.Width + 5;
 
@@ -44,5 +47,5 @@ public class Sword : MeleeWeapon
         }
     }
 
-    private float animationTimer => (float)Attacker.GetReload().PassedTime.TotalMilliseconds;
+    private float animationTimer => (float)Attacker.GetAnimationReload().PassedTime.TotalMilliseconds;
 }

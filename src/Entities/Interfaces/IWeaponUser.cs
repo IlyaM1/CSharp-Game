@@ -8,8 +8,9 @@ public interface IWeaponUser
 {
     public Vector2 FindWeaponStart();
     public void onAttack();
-    public bool IsAttacking();
     public MeleeWeapon GetCurrentWeapon();
     public Direction GetDirection();
-    public Reload GetReload();
+    public Reload GetAnimationReload();
+
+    public virtual bool IsAttacking() => GetAnimationReload().State == ReloadState.Reloading;
 }

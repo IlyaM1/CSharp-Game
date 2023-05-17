@@ -10,12 +10,21 @@ public abstract class MeleeWeapon
 {
     public IWeaponUser Attacker { get; private set; }
     public abstract int WeaponLength { get; }
-    public int AttackDuration { get; protected set; }
+    public int AttackDuration { get; set; }
+    public int Damage { get; set; }
+    public ulong CurrentAttackNumber { get; protected set; }
 
     public MeleeWeapon(IWeaponUser attacker)
     {
         Attacker = attacker;
         AttackDuration = 250;
+        Damage = 10;
+        CurrentAttackNumber = 0;
+    }
+
+    public virtual void onAttack()
+    {
+        CurrentAttackNumber++;
     }
 
     public bool CheckCollision(GameObject gameObject, Direction direction)

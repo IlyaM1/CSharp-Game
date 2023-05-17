@@ -6,11 +6,9 @@ using Dyhar.src.Entities;
 using Dyhar.src.Control;
 using Dyhar.src.LevelsCreator;
 using Dyhar.src.Utils;
-
-using System.Linq;
 using Dyhar.src.Drawing;
 using Dyhar.src.Entities.AbstractClasses;
-using System;
+using Dyhar.src.Entities.Interfaces;
 
 namespace Dyhar
 {
@@ -26,6 +24,8 @@ namespace Dyhar
 
         Level currentLevel;
 
+        Texture2D _gridCube;
+
         public Dyhar()
         {
             _graphics = new GraphicsDeviceManager(this);
@@ -33,6 +33,8 @@ namespace Dyhar
 
             Content.RootDirectory = "Content";
             IsMouseVisible = true;
+
+            currentLevel = Level.CreateTestLevel(control, out player);
 
             //this.IsFixedTimeStep = true;//false;
             //this.TargetElapsedTime = TimeSpan.FromSeconds(1d / 30d); //60);
@@ -46,11 +48,6 @@ namespace Dyhar
             _graphics.ApplyChanges();
             LoadContent();
 
-            player = new Player(0, 0);
-            control.SetPlayer(player);
-
-            currentLevel = Level.CreateTestLevel(player);
-
             base.Initialize();
         }
 
@@ -62,6 +59,7 @@ namespace Dyhar
             EarthBlock.sprite = Content.Load<Texture2D>("Earth2");
             Sword.sprite = Content.Load<Texture2D>("Sword");
             Swordsman.sprite = Content.Load<Texture2D>("Swordsman");
+            _gridCube = Content.Load<Texture2D>("GridCube1");
 
             standardFont = Content.Load<SpriteFont>("galleryFont");
 
@@ -81,10 +79,13 @@ namespace Dyhar
                 if (TypesUtils.CanBeDownCasted<GameObject, MovingGameObject>(gameObject))
                     currentLevel.Physics.Move((MovingGameObject)gameObject);
 
-                foreach (var weaponUser in currentLevel.weaponUsers)
+                foreach (var weaponUser in currentLevel.GetWeaponUsers())
                     if (weaponUser.IsAttacking())
                         if (weaponUser.GetCurrentWeapon().CheckCollision(gameObject, weaponUser.GetDirection()))
                             gameObject.onAttacked(weaponUser.GetCurrentWeapon());
+
+                if (!gameObject.IsAlive)
+                    currentLevel.GameObjects.Remove(gameObject);
 
                 gameObject.onUpdate(gameTime);
             }
@@ -102,10 +103,19 @@ namespace Dyhar
             {
                 var gameObject = currentLevel.GameObjects[i];
                 gameObject.Draw(_spriteBatch);
-                foreach (var weaponUser in currentLevel.weaponUsers)
+
+                if (TypesUtils.CanBeDownCasted<GameObject, IWeaponUser>(gameObject))
+                {
+                    var weaponUser = (IWeaponUser)gameObject;
                     if (weaponUser.IsAttacking())
                         weaponUser.GetCurrentWeapon().Draw(_spriteBatch);
+                }
             }
+
+            //for (var i = 0; i < currentLevel.Width; i += 50)
+            //    for (var j = 0; j < currentLevel.Height; j+=50)
+            //        _spriteBatch.Draw(_gridCube, new Rectangle(i, j, 50, 50), Color.White);
+
             _spriteBatch.End();
 
             base.Draw(gameTime);

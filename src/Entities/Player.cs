@@ -10,9 +10,6 @@ namespace Dyhar.src.Entities
     public class Player : MovingGameObject, IWarrior, IWeaponUser
     {
         public static Texture2D sprite;
-        public Direction DirectionLook { get; private set; }
-        public MeleeWeapon CurrentWeapon { get; private set; }
-        public Reload AttackAnimationReload { get; private set; }
 
         public Player(int x, int y)
         {
@@ -21,15 +18,16 @@ namespace Dyhar.src.Entities
             Speed = 10.0f;
             Force = new Vector2(0, 0);
             IsSolid = false;
-            DirectionLook = Direction.Right;
-            CurrentWeapon = new Sword(this);
-            AttackAnimationReload = new Reload("attack_animation", CurrentWeapon.AttackDuration);
+            directionLook = Direction.Right;
+            currentWeapon = new Sword(this);
+            attackAnimationReload = new Reload(currentWeapon.AttackDuration);
+            multipleJumpsReload = new Reload(10, onMultipleJumpsReloadFinish);
             currentHealthPoints = maxHealthPoints;
         }
 
         public void MoveHorizontally(Direction direction)
         {
-            DirectionLook = direction;
+            directionLook = direction;
 
             if (direction == Direction.Left)
                 Force.X -= (float)Speed;
@@ -66,8 +64,6 @@ namespace Dyhar.src.Entities
             CheckAllReloads(gameTime);
         }
 
-        public override Texture2D GetSprite() => sprite;
-
         public override void onCollision(GameObject collisionObject)
         {
             return;
@@ -75,9 +71,9 @@ namespace Dyhar.src.Entities
 
         public Vector2 FindWeaponStart()
         {
-            if (DirectionLook == Direction.Right)
+            if (directionLook == Direction.Right)
                 return new Vector2((float)(X + Size.Width), (float)(Y + (Size.Height / 2)));
-            if (DirectionLook == Direction.Left)
+            if (directionLook == Direction.Left)
                 return new Vector2((float)(X), (float)(Y + (Size.Height / 2)));
 
             throw new Exception("Impossible Direction");
@@ -85,14 +81,29 @@ namespace Dyhar.src.Entities
 
         public void onAttack()
         {
-            AttackAnimationReload.Start();
+            currentWeapon.onAttack();
+            attackAnimationReload.Start();
         }
 
-        public bool IsAttacking() => AttackAnimationReload.State == ReloadState.Reloading;
-        public MeleeWeapon GetCurrentWeapon() => CurrentWeapon;
-        public Direction GetDirection() => DirectionLook;
-        public Reload GetReload() => AttackAnimationReload;
+        public override void onAttacked(MeleeWeapon weapon)
+        {
+            if (lastAttackNumber == weapon.CurrentAttackNumber)
+                return;
+            else
+                lastAttackNumber = weapon.CurrentAttackNumber;
+
+            currentHealthPoints -= weapon.Damage;
+            if (currentHealthPoints <= 0)
+                onDeath();
+        }
+
+        public override Texture2D GetSprite() => sprite;
+        public MeleeWeapon GetCurrentWeapon() => currentWeapon;
+        public Direction GetDirection() => directionLook;
+        public Reload GetAnimationReload() => attackAnimationReload;
         public double GetCurrentHp() => currentHealthPoints;
+
+
 
 
 
@@ -102,27 +113,30 @@ namespace Dyhar.src.Entities
         int maxNumberOfExtraJumps = 3;
         int JumpPower = 15;
 
-        Reload multipleJumpsReload = new Reload("jump_reload", 10);
+        Reload multipleJumpsReload;
         double maxHealthPoints = 100.0;
         double currentHealthPoints = 100.0;
 
-        private void CheckAllReloads(GameTime gameTime)
+        Direction directionLook;
+        MeleeWeapon currentWeapon;
+        Reload attackAnimationReload;
+
+        private ulong lastAttackNumber = 0;
+
+        void CheckAllReloads(GameTime gameTime)
         {
             multipleJumpsReload.OnUpdate(gameTime);
-            if (multipleJumpsReload.State == ReloadState.Finished)
-            {
-                if (numberOfExtraJumps < maxNumberOfExtraJumps)
-                {
-                    numberOfExtraJumps += 1;
-                    multipleJumpsReload.CompletedFinishedCheck();
-                    if (numberOfExtraJumps < maxNumberOfExtraJumps)
-                        multipleJumpsReload.Start();
-                }
-            }
+            attackAnimationReload.OnUpdate(gameTime);
+        }
 
-            AttackAnimationReload.OnUpdate(gameTime);
-            if (AttackAnimationReload.State == ReloadState.Finished)
-                AttackAnimationReload.CompletedFinishedCheck();
+        void onMultipleJumpsReloadFinish()
+        {
+            if (numberOfExtraJumps < maxNumberOfExtraJumps)
+            {
+                numberOfExtraJumps += 1;
+                if (numberOfExtraJumps < maxNumberOfExtraJumps)
+                    multipleJumpsReload.Start();
+            }
         }
     }
 }
