@@ -37,11 +37,11 @@ public class Level
         currentLevel.GameObjects.Add(new EarthBlock(250, 600, 250, 50));
         currentLevel.GameObjects.Add(new EarthBlock(250, 1000, 250, 200));
 
-        currentLevel.GameObjects.Add(new Swordsman(700, 50));
-        currentLevel.GameObjects.Add(new Swordsman(400, 120));
-        currentLevel.GameObjects.Add(new Swordsman(100, 50));
-        currentLevel.GameObjects.Add(new Swordsman(500, 50));
-        currentLevel.GameObjects.Add(new Swordsman(1000, 600));
+        //currentLevel.GameObjects.Add(new Swordsman(700, 50));
+        //currentLevel.GameObjects.Add(new Swordsman(400, 120));
+        //currentLevel.GameObjects.Add(new Swordsman(100, 50));
+        //currentLevel.GameObjects.Add(new Swordsman(500, 50));
+        //currentLevel.GameObjects.Add(new Swordsman(1000, 600));
         
 
         return currentLevel;

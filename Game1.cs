@@ -63,7 +63,8 @@ namespace Dyhar
 
             standardFont = Content.Load<SpriteFont>("galleryFont");
 
-            camera = new Camera(_graphics.GraphicsDevice.Viewport);
+            camera = new Camera(_graphics.GraphicsDevice.Viewport, currentLevel.Width, currentLevel.Height);
+            control.setCamera(camera);
         }
 
         protected override void Update(GameTime gameTime)
@@ -97,7 +98,7 @@ namespace Dyhar
         {
             GraphicsDevice.Clear(Color.CornflowerBlue);
 
-            camera.Update(player.Position, currentLevel.Width, currentLevel.Height);
+            camera.Update(player.Position);
             _spriteBatch.Begin(transformMatrix: camera.Transform);
             for (var i = 0; i < currentLevel.GameObjects.Count; i++)
             {

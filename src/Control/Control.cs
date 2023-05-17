@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework.Input;
 using System;
 using Dyhar.src.Mechanics;
 using System.Collections.Generic;
+using Dyhar.src.Drawing;
 
 namespace Dyhar.src.Control
 {
@@ -17,6 +18,7 @@ namespace Dyhar.src.Control
     {
         ControlState State { get; set; }
         Player player;
+        Camera camera;
 
         List<Keys> pressedKeys = new List<Keys>();
         bool isPressedLeftMouse = false;
@@ -43,6 +45,8 @@ namespace Dyhar.src.Control
                 PressButton(Keys.D, () => player.MoveHorizontally(Direction.Right));
             if (keyboardState.IsKeyDown(Keys.W) && !pressedKeys.Contains(Keys.W))
                 PressButton(Keys.W, () => player.Jump());
+            if (keyboardState.IsKeyDown(Keys.LeftShift) && !pressedKeys.Contains(Keys.LeftShift))
+                PressButton(Keys.LeftShift, () => player.Dash(mouseState, camera));
 
             if (mouseState.LeftButton == ButtonState.Pressed && !isPressedLeftMouse)
                 PressLeftMouse(() => player.onAttack());
@@ -83,6 +87,11 @@ namespace Dyhar.src.Control
         public void SetPlayer(Player player)
         {
             this.player = player;
+        }
+
+        public void setCamera(Camera camera)
+        {
+            this.camera = camera;
         }
     }
 }

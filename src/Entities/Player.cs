@@ -4,6 +4,8 @@ using Dyhar.src.Mechanics;
 using System;
 using Dyhar.src.Entities.Interfaces;
 using Dyhar.src.Entities.AbstractClasses;
+using Microsoft.Xna.Framework.Input;
+using Dyhar.src.Drawing;
 
 namespace Dyhar.src.Entities
 {
@@ -22,7 +24,29 @@ namespace Dyhar.src.Entities
             currentWeapon = new Sword(this);
             attackAnimationReload = new Reload(currentWeapon.AttackDuration);
             multipleJumpsReload = new Reload(10, onMultipleJumpsReloadFinish);
+            dashReload = new Reload(3000);
             currentHealthPoints = maxHealthPoints;
+        }
+
+        public void Dash(MouseState mouseState, Camera camera)
+        {
+            if (camera is null)
+                throw new ArgumentNullException("Camera in control not setted");
+
+            if (canDash)
+            {
+                var screenPosition = camera.MapPositionToScreenPosition(Position);
+
+                if (mouseState.X > screenPosition.X + Size.Width)
+                    directionLook = Direction.Right;
+                else if (mouseState.X < screenPosition.X)
+                    directionLook = Direction.Left;
+
+                Force.X += directionLook == Direction.Right ? dashPower : -dashPower;
+
+                dashAnimationReload.Start();
+                dashReload.Start();
+            } 
         }
 
         public void MoveHorizontally(Direction direction)
@@ -30,11 +54,11 @@ namespace Dyhar.src.Entities
             directionLook = direction;
 
             if (direction == Direction.Left)
-                Force.X -= (float)Speed;
+                Force.X -= Speed;
             else if (direction == Direction.Right)
-                Force.X += (float)Speed;
+                Force.X += Speed;
             else
-                throw new ArgumentException();
+                throw new ArgumentException("Impossible Direction");
         }
 
         public void Jump()
@@ -114,8 +138,8 @@ namespace Dyhar.src.Entities
         int JumpPower = 15;
 
         Reload multipleJumpsReload;
-        double maxHealthPoints = 100.0;
-        double currentHealthPoints = 100.0;
+        double maxHealthPoints = 1000000.0;
+        double currentHealthPoints = 1000000.0;
 
         Direction directionLook;
         MeleeWeapon currentWeapon;
@@ -123,10 +147,17 @@ namespace Dyhar.src.Entities
 
         private ulong lastAttackNumber = 0;
 
+        private int dashPower = 500;
+        private bool canDash => dashReload.State == ReloadState.NotStarted;
+        Reload dashAnimationReload = new Reload(50);
+        Reload dashReload;
+
         void CheckAllReloads(GameTime gameTime)
         {
             multipleJumpsReload.OnUpdate(gameTime);
             attackAnimationReload.OnUpdate(gameTime);
+            dashAnimationReload.OnUpdate(gameTime);
+            dashReload.OnUpdate(gameTime);
         }
 
         void onMultipleJumpsReloadFinish()
