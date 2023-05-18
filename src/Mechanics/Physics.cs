@@ -1,5 +1,5 @@
 ﻿using Dyhar.src.Entities.AbstractClasses;
-using Dyhar.src.LevelsCreator;
+using Dyhar.src.Level;
 using Dyhar.src.Utils;
 using Microsoft.Xna.Framework;
 using System;
@@ -9,10 +9,10 @@ namespace Dyhar.src.Mechanics
 {
     public sealed class Physics
     {
-        private Level level;
+        private Level.Level level;
         private float accelerationOfFreeFall { get; set; }
 
-        public Physics(Level level, float accelerationOfFreeFall = 0.6f)
+        public Physics(Level.Level level, float accelerationOfFreeFall = 0.6f)
         {
             this.level = level;
             this.accelerationOfFreeFall = accelerationOfFreeFall;

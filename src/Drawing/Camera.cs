@@ -1,7 +1,7 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework;
 using System;
-using Dyhar.src.LevelsCreator;
+using Dyhar.src.Level;
 
 namespace Dyhar.src.Drawing;
 

@@ -4,7 +4,7 @@ using Microsoft.Xna.Framework.Input;
 
 using Dyhar.src.Entities;
 using Dyhar.src.Control;
-using Dyhar.src.LevelsCreator;
+using Dyhar.src.Level;
 using Dyhar.src.Utils;
 using Dyhar.src.Drawing;
 using Dyhar.src.Entities.AbstractClasses;
@@ -34,7 +34,7 @@ namespace Dyhar
             Content.RootDirectory = "Content";
             IsMouseVisible = true;
 
-            currentLevel = Level.CreateTestLevel(control, out player);
+            currentLevel = Level.CreateLevelFromFile("TestLevel", control, out player);
 
             //this.IsFixedTimeStep = true;//false;
             //this.TargetElapsedTime = TimeSpan.FromSeconds(1d / 30d); //60);

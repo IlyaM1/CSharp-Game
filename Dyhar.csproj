@@ -11,6 +11,11 @@
     <ApplicationIcon>Icon.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Remove="src\Level\LevelFiles\**" />
+    <EmbeddedResource Remove="src\Level\LevelFiles\**" />
+    <None Remove="src\Level\LevelFiles\**" />
+  </ItemGroup>
+  <ItemGroup>
     <None Remove="Icon.ico" />
     <None Remove="Icon.bmp" />
   </ItemGroup>
