@@ -1,3 +1,2 @@
-﻿
-using var game = new Dyhar.Dyhar();
-game.Run();
+﻿var dyhar = new Dyhar.Dyhar();
+dyhar.Run();

@@ -1,97 +1,60 @@
-﻿using Dyhar.src.Entities;
-using Microsoft.Xna.Framework.Input;
-using System;
-using Dyhar.src.Mechanics;
+﻿using Microsoft.Xna.Framework.Input;
 using System.Collections.Generic;
-using Dyhar.src.Drawing;
+using System;
 
-namespace Dyhar.src.Control
+namespace Dyhar.src.Control;
+
+public class Control
 {
-    public enum ControlState
+    public List<Keys> PressedKeys { get; set; }
+    public bool IsPressedLeftMouse { get; set; }
+
+    public Control()
     {
-        Menu,
-        Game,
-        Interface
+        PressedKeys = new List<Keys>();
+        IsPressedLeftMouse = false;
     }
 
-    public sealed class Control
+    public bool CanReleaseKeyBePressed(KeyboardState keyboardState, Keys key)
     {
-        ControlState State { get; set; }
-        Player player;
-        Camera camera;
+        if (keyboardState.IsKeyDown(key) && !PressedKeys.Contains(key))
+            return true;
+        return false;
+    }
 
-        List<Keys> pressedKeys = new List<Keys>();
-        bool isPressedLeftMouse = false;
+    public bool CanPressKeyBePressed(KeyboardState keyboardState, Keys key)
+    {
+        if (keyboardState.IsKeyDown(key))
+            return true;
+        return false;
+    }
 
-        public Control(ControlState state)
-        {
-            State = state;
-        }
+    public void PressButton(Keys key, Action action)
+    {
+        PressedKeys.Add(key);
+        action();
+    }
 
-        public void onUpdate(MouseState mouseState, KeyboardState keyboardState)
-        {
-            if (State == ControlState.Game)
-                onGameUpdate(mouseState, keyboardState);
-        }
+    public void PressLeftMouse(Action action)
+    {
+        IsPressedLeftMouse = true;
+        action();
+    }
 
-        public void onGameUpdate(MouseState mouseState, KeyboardState keyboardState)
-        {
-            if (player == null)
-                throw new Exception("Player isn't setted in control");
+    public void RemoveUnpressedKeys(KeyboardState keyboardState)
+    {
+        var unpressedKeys = new List<Keys>();
+        foreach (var key in PressedKeys)
+            if (keyboardState.IsKeyUp(key))
+                unpressedKeys.Add(key);
 
-            if (keyboardState.IsKeyDown(Keys.A))
-                PressButton(Keys.A, () => player.MoveHorizontally(Direction.Left));
-            if (keyboardState.IsKeyDown(Keys.D))
-                PressButton(Keys.D, () => player.MoveHorizontally(Direction.Right));
-            if (keyboardState.IsKeyDown(Keys.W) && !pressedKeys.Contains(Keys.W))
-                PressButton(Keys.W, () => player.Jump());
-            if (keyboardState.IsKeyDown(Keys.LeftShift) && !pressedKeys.Contains(Keys.LeftShift))
-                PressButton(Keys.LeftShift, () => player.Dash(mouseState, camera));
+        foreach (var key in unpressedKeys)
+            PressedKeys.Remove(key);
+    }
 
-            if (mouseState.LeftButton == ButtonState.Pressed && !isPressedLeftMouse)
-                PressLeftMouse(() => player.onAttack());
-
-            RemoveUnpressedKeys(keyboardState);
-            UnpressLeftMouse(mouseState);
-        }
-
-        private void PressButton(Keys key, Action action)
-        {
-            pressedKeys.Add(key);
-            action();
-        }
-
-        private void PressLeftMouse(Action action)
-        {
-            isPressedLeftMouse = true;
-            action();
-        }
-
-        private void RemoveUnpressedKeys(KeyboardState keyboardState)
-        {
-            var unpressedKeys = new List<Keys>();
-            foreach (var key in pressedKeys)
-                if (keyboardState.IsKeyUp(key))
-                    unpressedKeys.Add(key);
-
-            foreach(var key in unpressedKeys)
-                pressedKeys.Remove(key);
-        }
-
-        private void UnpressLeftMouse(MouseState mouseState)
-        {
-            if (mouseState.LeftButton == ButtonState.Released)
-                isPressedLeftMouse = false;
-        }
-
-        public void SetPlayer(Player player)
-        {
-            this.player = player;
-        }
-
-        public void setCamera(Camera camera)
-        {
-            this.camera = camera;
-        }
+    public void UnpressLeftMouse(MouseState mouseState)
+    {
+        if (mouseState.LeftButton == ButtonState.Released)
+            IsPressedLeftMouse = false;
     }
 }

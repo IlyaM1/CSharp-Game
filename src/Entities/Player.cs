@@ -27,20 +27,13 @@ namespace Dyhar.src.Entities
             currentHealthPoints = maxHealthPoints;
         }
 
-        public void Dash(MouseState mouseState, Camera camera)
+        public void Dash(Camera camera)
         {
             if (camera is null)
                 throw new ArgumentNullException("Camera in control not setted");
 
             if (canDash)
             {
-                var screenPosition = camera.MapPositionToScreenPosition(Position);
-
-                if (mouseState.X > screenPosition.X + Size.Width)
-                    directionLook = Direction.Right;
-                else if (mouseState.X < screenPosition.X)
-                    directionLook = Direction.Left;
-
                 Force.X += directionLook == Direction.Right ? dashPower : -dashPower;
 
                 dashAnimationReload.Start();

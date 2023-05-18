@@ -35,30 +35,7 @@ public class Level
         Height = height;
     }
 
-    public static Level CreateTestLevel(Control.Control control, out Player player)
-    {
-        var playerObject = new Player(0, 0);
-        player = playerObject;
-        control.SetPlayer(playerObject);
-
-        var currentLevel = new Level(new List<GameObject>(), 5000, 1200);
-
-        currentLevel.GameObjects.Add(player);
-
-        currentLevel.GameObjects.Add(new EarthBlock(250, 600, 250, 50));
-        currentLevel.GameObjects.Add(new EarthBlock(250, 1000, 250, 200));
-        currentLevel.GameObjects.Add(new EarthBlock(1250, 600, 250, 300));
-        currentLevel.GameObjects.Add(new EarthBlock(2500, 1000, 250, 200));
-
-        currentLevel.GameObjects.Add(new Swordsman(400, 120));
-        currentLevel.GameObjects.Add(new Swordsman(2500, 500));
-        currentLevel.GameObjects.Add(new Swordsman(4000, 600));
-
-
-        return currentLevel;
-    }
-
-    public static Level CreateLevelFromFile(string fileName, Control.Control control, out Player player)
+    public static Level CreateLevelFromFile(string fileName, Control.GameControl control, out Player player)
     {
         Level parsedLevel = LevelParser.Parse(fileName);
 
