@@ -17,14 +17,13 @@ namespace Dyhar.src.Entities
         {
             X = x; 
             Y = y;
-            Speed = 10.0f;
+            Speed = 12.0f;
             Force = new Vector2(0, 0);
             IsSolid = false;
             directionLook = Direction.Right;
             currentWeapon = new Sword(this);
             attackAnimationReload = new Reload(currentWeapon.AttackDuration);
-            multipleJumpsReload = new Reload(10, onMultipleJumpsReloadFinish);
-            dashReload = new Reload(3000);
+            multipleJumpsReload = new Reload(1500, onMultipleJumpsReloadFinish);
             currentHealthPoints = maxHealthPoints;
         }
 
@@ -88,11 +87,6 @@ namespace Dyhar.src.Entities
             CheckAllReloads(gameTime);
         }
 
-        public override void onCollision(GameObject collisionObject)
-        {
-            return;
-        }
-
         public Vector2 FindWeaponStart()
         {
             if (directionLook == Direction.Right)
@@ -134,12 +128,12 @@ namespace Dyhar.src.Entities
 
         bool IsInJump = false;
         int numberOfExtraJumps = 1;
-        int maxNumberOfExtraJumps = 3;
+        int maxNumberOfExtraJumps = 1;
         int JumpPower = 15;
 
         Reload multipleJumpsReload;
-        double maxHealthPoints = 1000000.0;
-        double currentHealthPoints = 1000000.0;
+        double maxHealthPoints = 200;
+        double currentHealthPoints = 200;
 
         Direction directionLook;
         MeleeWeapon currentWeapon;
@@ -147,10 +141,10 @@ namespace Dyhar.src.Entities
 
         private ulong lastAttackNumber = 0;
 
-        private int dashPower = 500;
+        private int dashPower = 800;
         private bool canDash => dashReload.State == ReloadState.NotStarted;
         Reload dashAnimationReload = new Reload(50);
-        Reload dashReload;
+        Reload dashReload = new Reload(2000);
 
         void CheckAllReloads(GameTime gameTime)
         {

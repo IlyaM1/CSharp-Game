@@ -80,6 +80,13 @@ namespace Dyhar
                 if (TypesUtils.CanBeDownCasted<GameObject, MovingGameObject>(gameObject))
                     currentLevel.Physics.Move((MovingGameObject)gameObject);
 
+                if (TypesUtils.CanBeDownCasted<GameObject, Enemy>(gameObject))
+                {
+                    var enemy = (Enemy)gameObject;
+                    if (enemy.IsOnPlayerScreen(camera))
+                        enemy.onPlayerScreen(player);
+                }
+
                 foreach (var weaponUser in currentLevel.GetWeaponUsers())
                     if (weaponUser.IsAttacking())
                         if (weaponUser.GetCurrentWeapon().CheckCollision(gameObject, weaponUser.GetDirection()))
@@ -113,9 +120,9 @@ namespace Dyhar
                 }
             }
 
-            //for (var i = 0; i < currentLevel.Width; i += 50)
-            //    for (var j = 0; j < currentLevel.Height; j+=50)
-            //        _spriteBatch.Draw(_gridCube, new Rectangle(i, j, 50, 50), Color.White);
+            for (var i = 0; i < currentLevel.Width; i += 50)
+                for (var j = 0; j < currentLevel.Height; j += 50)
+                    _spriteBatch.Draw(_gridCube, new Rectangle(i, j, 50, 50), Color.White);
 
             _spriteBatch.End();
 

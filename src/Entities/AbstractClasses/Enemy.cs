@@ -1,4 +1,5 @@
-﻿using Dyhar.src.Entities.Interfaces;
+﻿using Dyhar.src.Drawing;
+using Dyhar.src.Entities.Interfaces;
 namespace Dyhar.src.Entities.AbstractClasses;
 
 public abstract class Enemy : MovingGameObject, IWarrior
@@ -24,7 +25,19 @@ public abstract class Enemy : MovingGameObject, IWarrior
     }
 
     public abstract double GetCurrentHp();
-    public abstract void onPlayerScreen(Player player);
+    public virtual void onPlayerScreen(Player player)
+    {
+        return;
+    }
+
+    public bool IsOnPlayerScreen(Camera camera)
+    {
+        var screenPosition = camera.MapPositionToScreenPosition(Position);
+        if (screenPosition.X >= 0 && screenPosition.X <= Resolution.etalonWidth)
+            if (screenPosition.Y >= 0 && screenPosition.Y <= Resolution.etalonHeight)
+                return true;
+        return false;
+    }
 
     protected double maxHealthPoints = 100.0;
     protected double currentHealthPoints;

@@ -20,8 +20,9 @@ public abstract class GameObject
 
     public bool IsSolid { get; protected set; }
 
-    public abstract void onUpdate(GameTime gameTime);
-    public abstract void onCollision(GameObject collisionObject);
+    public virtual void onUpdate(GameTime gameTime) { }
+    public virtual void onCollision(GameObject collisionObject) { }
+
     public abstract Texture2D GetSprite();
 
     public virtual bool CheckCollision(GameObject otherObject)
@@ -29,10 +30,7 @@ public abstract class GameObject
         return CheckCollision(X, Y, Size, otherObject.X, otherObject.Y, otherObject.Size);
     }
 
-    public virtual void onAttacked(MeleeWeapon weapon)
-    {
-        return;
-    }
+    public virtual void onAttacked(MeleeWeapon weapon) { }
 
     public virtual void onDeath()
     {

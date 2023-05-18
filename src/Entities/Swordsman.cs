@@ -3,63 +3,59 @@ using Dyhar.src.Entities.Interfaces;
 using Dyhar.src.Mechanics;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using System.Collections;
 
 namespace Dyhar.src.Entities;
 
-internal class Path
-{
-    public Queue path = new Queue();
-}
-
 public class Swordsman : Enemy, IWeaponUser
 {
-    
-    Path FindPathToPlayer(Player player)
-    {
-        return new Path();
-    }
-
-    void MoveWithPath()
-    {
-        if (currentPath is null)
-            return;
-    }
-
     public override void onPlayerScreen(Player player)
     {
-        var path = FindPathToPlayer(player);
-        return;
+        if (player.X <= X)
+        {
+            if ((player.Position - Position).Length() >= 120)
+                X -= 5;
+            direction = Direction.Left;
+        }
+        else if (player.X > X)
+        {
+            if ((player.Position - Position).Length() >= 120)
+                X += 5;
+            direction = Direction.Right;
+        }
+
+        Jump();
+
+        // TODO: Make Jump when it's needed
+
+        if (attackAnimationReload.State == ReloadState.NotStarted 
+            && delayBetweenAttacks.State == ReloadState.NotStarted)
+        {
+            onAttack();
+        }
     }
 
-    public override void onCollision(GameObject collisionObject)
+    public void Jump()
     {
-        return;
+        if (!IsInJump)
+        {
+            IsInJump = true;
+            Force.Y = -JumpPower;
+            return;
+        }
     }
 
-    public override void onIsOnGround()
-    {
-        return;
-    }
-
-    
 
     public override void onUpdate(GameTime gameTime)
     {
-        CheckAllReloads(gameTime);
-
-        if (attackAnimationReload.State == ReloadState.NotStarted)
-            onAttack();
+        CheckAllReloads(gameTime);  
     }
 
     public static Texture2D sprite;
 
-    private Path currentPath;
-
     public Swordsman(int x, int y) : base(x, y)
     {
         sword = new Sword(this);
-        sword.AttackDuration = 1500;
+        sword.AttackDuration = 500;
         attackAnimationReload = new Reload(sword.AttackDuration);
     }
 
@@ -75,6 +71,12 @@ public class Swordsman : Enemy, IWeaponUser
     {
         sword.onAttack();
         attackAnimationReload.Start();
+        delayBetweenAttacks.Start();
+    }
+
+    public override void onIsOnGround()
+    {
+        IsInJump = false;
     }
 
     private Direction direction = Direction.Left;
@@ -85,8 +87,14 @@ public class Swordsman : Enemy, IWeaponUser
     public Direction GetDirection() => direction;
     public Reload GetAnimationReload() => attackAnimationReload;
 
+    bool IsInJump = false;
+    int JumpPower = 18;
+
     void CheckAllReloads(GameTime gameTime)
     {
         attackAnimationReload.OnUpdate(gameTime);
+        delayBetweenAttacks.OnUpdate(gameTime);
     }
+
+    private Reload delayBetweenAttacks = new Reload(1000);
 }

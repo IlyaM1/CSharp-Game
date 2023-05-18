@@ -8,6 +8,6 @@ namespace Dyhar.src.Entities.AbstractClasses
         public float Speed { get; set; }
         public bool IsOnGround { get; set; }
 
-        public abstract void onIsOnGround();
+        public virtual void onIsOnGround() { }
     }
 }
