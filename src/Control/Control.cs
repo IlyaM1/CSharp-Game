@@ -29,6 +29,11 @@ public class Control
         return false;
     }
 
+    public bool CanReleaseLeftMouseBePressed(MouseState mouseState)
+    {
+        return mouseState.LeftButton == ButtonState.Pressed && !IsPressedLeftMouse;
+    }
+
     public void PressButton(Keys key, Action action)
     {
         PressedKeys.Add(key);

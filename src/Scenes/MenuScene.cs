@@ -22,6 +22,7 @@ public class MenuScene : Scene
             "New Game",
             "Load Game",
             "Settings",
+            "Levels creator",
             "Quit"
         };
         selectedItemIndex = 0;
@@ -93,6 +94,10 @@ public class MenuScene : Scene
                 SceneToRun = null;
                 break;
             case 3:
+                IsDone = true;
+                SceneToRun = typeof(LevelCreatorScene);
+                break;
+            case 4:
                 IsDone = true;
                 SceneToRun = null;
                 break;

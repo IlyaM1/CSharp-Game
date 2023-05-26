@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework;
 using System;
 using Dyhar.src.Level;
+using System.Drawing;
 
 namespace Dyhar.src.Drawing;
 
@@ -10,7 +11,7 @@ public class Camera
     public Matrix Transform;
     private Viewport viewport;
 
-    public Vector2 Position { get; private set; }
+    public Vector2 Position { get; set; }
 
     public float ZoomWidth { get; private set; }
     public float ZoomHeight { get; private set; }
@@ -50,5 +51,16 @@ public class Camera
     public Vector2 MapPositionToScreenPosition(Vector2 mapPosition)
     {
         return Vector2.Transform(mapPosition, Transform);
+    }
+
+    public Vector2 ScreenPositionToMapPosition(Vector2 screenPosition)
+    {
+        return Vector2.Transform(screenPosition, Matrix.Invert(Transform));
+    }
+
+    public void SetNewMapSize(Size size)
+    {
+        mapWidth = size.Width;
+        mapHeight = size.Height;
     }
 }

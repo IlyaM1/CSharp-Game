@@ -18,7 +18,7 @@ public abstract class MeleeWeapon
     {
         Attacker = attacker;
         AttackDuration = 250;
-        Damage = 10;
+        Damage = 200;
         CurrentAttackNumber = 0;
     }
 

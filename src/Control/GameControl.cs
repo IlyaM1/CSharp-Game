@@ -49,7 +49,7 @@ namespace Dyhar.src.Control
                 control.PressButton(Keys.LeftShift, () => player.Dash(camera));
 
 
-            if (mouseState.LeftButton == ButtonState.Pressed && !control.IsPressedLeftMouse)
+            if (control.CanReleaseLeftMouseBePressed(mouseState))
                 control.PressLeftMouse(() => player.onAttack());
 
             control.RemoveUnpressedKeys(keyboardState);

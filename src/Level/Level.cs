@@ -19,6 +19,15 @@ public class Level
     public int Width { get; private set; }
     public int Height { get; private set; }
 
+    public int EnemyCount { get {
+            var result = 0;
+            foreach (var obj in GameObjects)
+                if (TypesUtils.CanBeDownCasted<GameObject, Enemy>(obj))
+                    result += 1;
+            return result; 
+        }
+    }
+
     public Level(List<GameObject> gameObjects)
     {
         GameObjects = gameObjects;
@@ -43,11 +52,17 @@ public class Level
         foreach (var gameObject in parsedLevel.GameObjects)
             if (gameObject is Player)
                 playerObject = (Player)gameObject;
+            
 
         player = playerObject;
         control.SetPlayer(playerObject);
 
         return parsedLevel;
+    }
+
+    public static Level CreateLevelFromFile(string fileName)
+    {
+        return LevelParser.Parse(fileName);
     }
 
     public void AddToGameObjects(GameObject gameObject)

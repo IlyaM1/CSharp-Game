@@ -20,13 +20,14 @@ public class GameScene : Scene
     GameControl control = new GameControl();
     Camera camera;
 
+    int levelNumber = 1;
     Level.Level currentLevel;
 
     Texture2D _gridCube;
 
     public GameScene()
     {
-        currentLevel = Level.Level.CreateLevelFromFile("TestLevel", control, out player);
+        currentLevel = Level.Level.CreateLevelFromFile("Level1", control, out player);
 
         //this.IsFixedTimeStep = true;//false;
         //this.TargetElapsedTime = TimeSpan.FromSeconds(1d / 30d); //60);
@@ -80,6 +81,10 @@ public class GameScene : Scene
 
             gameObject.onUpdate(gameTime);
         }
+
+        if (player.X + 200 >= currentLevel.Width)
+            if (currentLevel.EnemyCount == 0)
+                NextLevel();
     }
 
     public override void Draw(SpriteBatch spriteBatch)
@@ -100,10 +105,17 @@ public class GameScene : Scene
             }
         }
 
-        for (var i = 0; i < currentLevel.Width; i += 50)
-            for (var j = 0; j < currentLevel.Height; j += 50)
-                spriteBatch.Draw(_gridCube, new Rectangle(i, j, 50, 50), Color.White);
+        //for (var i = 0; i < currentLevel.Width; i += 50)
+        //    for (var j = 0; j < currentLevel.Height; j += 50)
+        //        spriteBatch.Draw(_gridCube, new Rectangle(i, j, 50, 50), Color.White);
 
         spriteBatch.End();
+    }
+
+    private void NextLevel()
+    {
+        levelNumber += 1;
+        currentLevel = Level.Level.CreateLevelFromFile("Level" + levelNumber.ToString(), control, out player);
+        camera.SetNewMapSize(new System.Drawing.Size(currentLevel.Width, currentLevel.Height));
     }
 }

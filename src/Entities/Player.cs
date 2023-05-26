@@ -17,13 +17,13 @@ namespace Dyhar.src.Entities
         {
             X = x; 
             Y = y;
-            Speed = 12.0f;
+            Speed = 16.0f;
             Force = new Vector2(0, 0);
             IsSolid = false;
             directionLook = Direction.Right;
             currentWeapon = new Sword(this);
             attackAnimationReload = new Reload(currentWeapon.AttackDuration);
-            multipleJumpsReload = new Reload(1500, onMultipleJumpsReloadFinish);
+            multipleJumpsReload = new Reload(10, onMultipleJumpsReloadFinish);
             currentHealthPoints = maxHealthPoints;
         }
 
@@ -125,8 +125,8 @@ namespace Dyhar.src.Entities
         int JumpPower = 15;
 
         Reload multipleJumpsReload;
-        double maxHealthPoints = 200;
-        double currentHealthPoints = 200;
+        double maxHealthPoints = 100000000;
+        double currentHealthPoints = 100000000;
 
         Direction directionLook;
         MeleeWeapon currentWeapon;
