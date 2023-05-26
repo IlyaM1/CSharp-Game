@@ -13,6 +13,8 @@ using Microsoft.Xna.Framework.Input;
 using System.Collections.Generic;
 using Dyhar.src.UI;
 using System.IO;
+using System.Linq;
+using System;
 
 namespace Dyhar.src.Scenes;
 
@@ -50,8 +52,10 @@ public class LevelCreatorScene : Scene
     List<string> levelNames;
     int gridSize = 50;
 
-    LevelObjects currentGameObject = LevelObjects.Swordsman;
+    LevelObjects currentGameObject = LevelObjects.Player;
     Mode currentMode = Mode.Creating;
+
+    Vector2 earthBlockCoordinates = new Vector2(float.NegativeInfinity, float.NegativeInfinity);
 
     public LevelCreatorScene()
     {
@@ -117,7 +121,10 @@ public class LevelCreatorScene : Scene
             IsDone = true;
             SceneToRun = typeof(MenuScene);
             var levelString = Level.LevelDeserialization.DeserializeLevel(currentLevel);
-            Level.LevelDeserialization.WriteToFile(levelName, levelString.ToString());
+            if (levelName == "New level")
+                levelName = "Level" + (levelNames.Count()).ToString();
+            if (CheckIfPlayerAlreadyExists() && currentLevel.EnemyCount > 0)
+                Level.LevelDeserialization.WriteToFile(levelName, levelString.ToString());
         }
 
         // TODO: make object changing, adding, deleting etc
@@ -172,6 +179,24 @@ public class LevelCreatorScene : Scene
             levelNames,
             x => ChangeLevel(x));
         widgets.Add(levelChoose);
+
+        var allGameObjectsNames = typeof(LevelObjects).GetEnumNames();
+        var levelObjectChoose = new DropdownList(new Rectangle(200, 0, 200, 50),
+            dropdownMenuSprite,
+            dropdownMenuElementSprite,
+            standardFont,
+            allGameObjectsNames.ToList(),
+            x => currentGameObject = (LevelObjects)Enum.Parse(typeof(LevelObjects), allGameObjectsNames[x]));
+        widgets.Add(levelObjectChoose);
+
+        var allModesNames = typeof(Mode).GetEnumNames();
+        var modeChoose = new DropdownList(new Rectangle(400, 0, 200, 50),
+            dropdownMenuSprite,
+            dropdownMenuElementSprite,
+            standardFont,
+            allModesNames.ToList(),
+            x => currentMode = (Mode)Enum.Parse(typeof(Mode), allModesNames[x]));
+        widgets.Add(modeChoose);
     }
 
     private List<string> GetAllLevelsNames()
@@ -217,15 +242,36 @@ public class LevelCreatorScene : Scene
     private void CreateModeAction(MouseState mouseState)
     {
         var gridCell = GetGridCellIndex((int)(mouseState.X + cameraX - 800), (int)(mouseState.Y + cameraY - 450));
+        if (FindCollisionObject(gridCell) != null)
+            return;
         var coordinates = new Vector2(gridCell.X * gridSize, gridCell.Y * gridSize);
         var coordinatesInStrings = new string[] { coordinates.X.ToString(), coordinates.Y.ToString() };
         var objectType = TypesUtils.GetTypeFromString(currentGameObject.ToString());
+
         if (currentGameObject == LevelObjects.EarthBlock)
         {
-            // TODO: make for EarthBlock
+            if (earthBlockCoordinates.X == float.NegativeInfinity && earthBlockCoordinates.Y == float.NegativeInfinity)
+                earthBlockCoordinates = coordinates;
+            else
+            {
+                if (coordinates.X > earthBlockCoordinates.X && coordinates.Y > earthBlockCoordinates.Y)
+                {
+                    var width = (int)(coordinates.X - earthBlockCoordinates.X) / gridSize * gridSize + gridSize;
+                    var height = (int)(coordinates.Y - earthBlockCoordinates.Y) / gridSize * gridSize + gridSize;
+                    var blockCoordinates = new[] { earthBlockCoordinates.X.ToString(), earthBlockCoordinates.Y.ToString(),
+                    width.ToString(), height.ToString() };
+
+                    var newGameObject = (GameObject)TypesUtils.CreateObject(typeof(EarthBlock), blockCoordinates);
+                    currentLevel.AddToGameObjects(newGameObject);
+                }
+
+                earthBlockCoordinates = new Vector2(float.NegativeInfinity, float.NegativeInfinity);   
+            }
         }
         else
         {
+            if (currentGameObject == LevelObjects.Player && CheckIfPlayerAlreadyExists())
+                return;
             var newGameObject = (GameObject)TypesUtils.CreateObject(objectType, coordinatesInStrings);
             currentLevel.AddToGameObjects(newGameObject);
         }
@@ -233,6 +279,27 @@ public class LevelCreatorScene : Scene
 
     private void DeleteModeAction(MouseState mouseState)
     {
+        var gridCell = GetGridCellIndex((int)(mouseState.X + cameraX - 800), (int)(mouseState.Y + cameraY - 450));
+        var coordinates = new Vector2(gridCell.X * gridSize, gridCell.Y * gridSize);
+        var collisionObject = FindCollisionObject(gridCell);
+        if (collisionObject != null)
+            currentLevel.GameObjects.Remove(collisionObject);
+    }
 
+    private bool CheckIfPlayerAlreadyExists()
+    {
+        foreach (var gameObject in currentLevel.GameObjects)
+            if (gameObject is Player)
+                return true;
+        return false;
+    }
+
+    private GameObject FindCollisionObject(Vector2 gridCell)
+    {
+        foreach (var gameObject in currentLevel.GameObjects)
+            if (gridCell.X * gridSize >= gameObject.X && gridCell.X * gridSize <= gameObject.X + gameObject.Width
+                && gridCell.Y * gridSize >= gameObject.Y && gridCell.Y * gridSize <= gameObject.Y + gameObject.Height)
+                return gameObject;
+        return null;
     }
 }
