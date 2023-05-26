@@ -32,6 +32,8 @@ internal enum Mode
 public class LevelCreatorScene : Scene
 {
     Level.Level currentLevel;
+    string levelName = "Level1";
+
     Camera camera;
     Texture2D _gridCube;
     SpriteFont standardFont;
@@ -54,7 +56,7 @@ public class LevelCreatorScene : Scene
     public LevelCreatorScene()
     {
         // currentLevel = new Level.Level(new List<GameObject>(), 1600, 900);
-        currentLevel = Level.Level.CreateLevelFromFile("Level1");
+        currentLevel = Level.Level.CreateLevelFromFile(levelName);
     }
 
     public override void Draw(SpriteBatch spriteBatch)
@@ -114,6 +116,8 @@ public class LevelCreatorScene : Scene
         {
             IsDone = true;
             SceneToRun = typeof(MenuScene);
+            var levelString = Level.LevelDeserialization.DeserializeLevel(currentLevel);
+            Level.LevelDeserialization.WriteToFile(levelName, levelString.ToString());
         }
 
         // TODO: make object changing, adding, deleting etc
@@ -186,6 +190,7 @@ public class LevelCreatorScene : Scene
 
     private void ChangeLevel(int levelIndex)
     {
+        levelName = levelNames[levelIndex];
         if (levelIndex == levelNames.Count - 1)
             CreateNewLevel();
         else
