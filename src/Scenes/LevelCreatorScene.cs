@@ -55,6 +55,10 @@ public class LevelCreatorScene : Scene
     LevelObjects currentGameObject = LevelObjects.Player;
     Mode currentMode = Mode.Creating;
 
+
+    NumberTextInput widthInput;
+    NumberTextInput heightInput;
+
     Vector2 earthBlockCoordinates = new Vector2(float.NegativeInfinity, float.NegativeInfinity);
 
     public LevelCreatorScene()
@@ -207,14 +211,14 @@ public class LevelCreatorScene : Scene
             x => currentMode = (Mode)Enum.Parse(typeof(Mode), allModesNames[x]));
         widgets.Add(modeChoose);
 
-        var widthInput = new NumberTextInput(new Rectangle(600, 0, 200, 50),
+        widthInput = new NumberTextInput(new Rectangle(600, 0, 200, 50),
             currentLevel.Width,
             5,
             standardFont,
             ChangeLevelWidth);
         widgets.Add(widthInput);
 
-        var heightInput = new NumberTextInput(new Rectangle(800, 0, 200, 50),
+        heightInput = new NumberTextInput(new Rectangle(800, 0, 200, 50),
             currentLevel.Height,
             5,
             standardFont,
@@ -250,12 +254,16 @@ public class LevelCreatorScene : Scene
     {
         currentLevel = new Level.Level(new List<GameObject>());
         camera.SetNewMapSize(new System.Drawing.Size(currentLevel.Width, currentLevel.Height));
+        ChangeWidthInputValue(currentLevel.Width);
+        ChangeHeightInputValue(currentLevel.Height);
     }
 
     private void ChangeExistingLevel(string levelName)
     {
         currentLevel = Level.Level.CreateLevelFromFile(levelName);
         camera.SetNewMapSize(new System.Drawing.Size(currentLevel.Width, currentLevel.Height));
+        ChangeWidthInputValue(currentLevel.Width);
+        ChangeHeightInputValue(currentLevel.Height);
     }
 
     private Vector2 GetGridCellIndex(int x, int y)
@@ -338,6 +346,7 @@ public class LevelCreatorScene : Scene
         {
             currentLevel.Width = width;
             camera.SetNewMapSize(new System.Drawing.Size(width, currentLevel.Height));
+            ChangeWidthInputValue(width);
         }
     }
 
@@ -347,6 +356,17 @@ public class LevelCreatorScene : Scene
         {
             currentLevel.Height = height;
             camera.SetNewMapSize(new System.Drawing.Size(currentLevel.Width, height));
+            ChangeHeightInputValue(height);
         }
+    }
+
+    private void ChangeWidthInputValue(int value)
+    {
+        widthInput.SetValue(value);
+    }
+
+    private void ChangeHeightInputValue(int value)
+    {
+        heightInput.SetValue(value);
     }
 }

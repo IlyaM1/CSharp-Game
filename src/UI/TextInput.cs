@@ -88,5 +88,11 @@ namespace Dyhar.src.UI
         {
             return int.Parse(_text);
         }
+
+        public void SetValue(int value)
+        {
+            if (value >= 0 && value <= Math.Pow(10, _maxLength))
+                _text = value.ToString();
+        }
     }
 }
