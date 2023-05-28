@@ -5,19 +5,16 @@ using Dyhar.src.Mechanics;
 using Dyhar.src.Utils;
 using System;
 using System.Collections.Generic;
-using System.Drawing;
-using System.IO;
-using System.Linq;
 
 namespace Dyhar.src.Level;
 
 public class Level
 {
     public List<GameObject> GameObjects { get; set; }
-    public Physics Physics { get; private set; }
+    public Physics Physics { get; set; }
 
-    public int Width { get; private set; }
-    public int Height { get; private set; }
+    public int Width { get; set; }
+    public int Height { get; set; }
 
     public int EnemyCount { get {
             var result = 0;

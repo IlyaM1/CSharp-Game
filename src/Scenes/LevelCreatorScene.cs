@@ -39,8 +39,8 @@ public class LevelCreatorScene : Scene
     Camera camera;
     Texture2D _gridCube;
     SpriteFont standardFont;
-    float cameraX = 800.0f;
-    float cameraY = 450.0f;
+    float cameraX = Resolution.etalonWidth / 2;
+    float cameraY = Resolution.etalonHeight / 2;
     Vector2 cameraPosition => new Vector2(cameraX, cameraY);
 
     Control.Control control = new Control.Control();
@@ -59,7 +59,6 @@ public class LevelCreatorScene : Scene
 
     public LevelCreatorScene()
     {
-        // currentLevel = new Level.Level(new List<GameObject>(), 1600, 900);
         currentLevel = Level.Level.CreateLevelFromFile(levelName);
     }
 
@@ -68,10 +67,10 @@ public class LevelCreatorScene : Scene
         camera.Update(cameraPosition);
         spriteBatch.Begin(transformMatrix: camera.Transform);
 
+        DrawLevel(spriteBatch);
+
         foreach (var widget in widgets)
             widget.Draw(spriteBatch);
-
-        DrawLevel(spriteBatch);
 
         spriteBatch.End();
     }
@@ -91,9 +90,19 @@ public class LevelCreatorScene : Scene
             }
         }
 
-        for (var i = 0; i < currentLevel.Width; i += 50)
-            for (var j = 0; j < currentLevel.Height; j += 50)
-                spriteBatch.Draw(_gridCube, new Rectangle(i, j, 50, 50), Color.White);
+        for (var i = 0; i < currentLevel.Width; i += gridSize)
+            for (var j = 0; j < currentLevel.Height; j += gridSize)
+                spriteBatch.Draw(_gridCube, new Rectangle(i, j, gridSize, gridSize), Color.White);
+
+        if (earthBlockCoordinates.X != float.NegativeInfinity && earthBlockCoordinates.Y != float.NegativeInfinity)
+        {
+            var mouse = Mouse.GetState();
+            var mouseInMapCoordinates = camera.ScreenPositionToMapPosition(new Vector2(mouse.X, mouse.Y));
+
+            for (var i = earthBlockCoordinates.X; i < mouseInMapCoordinates.X; i += gridSize)
+                for (var j = earthBlockCoordinates.Y; j < mouseInMapCoordinates.Y; j += gridSize)
+                    spriteBatch.Draw(EarthBlock.sprite, new Rectangle((int)i, (int)j, gridSize, gridSize), Color.Gray);
+        }
     }
 
     public override void LoadContent(ContentManager content, GraphicsDevice graphics)
@@ -132,10 +141,10 @@ public class LevelCreatorScene : Scene
         var mouseState = Mouse.GetState();
         var keyboardState = Keyboard.GetState();
 
-        MoveCameraUpdate(keyboardState);
-
         foreach (var widget in widgets)
             widget.Update(camera, control, mouseState, keyboardState);
+
+        MoveCameraUpdate(keyboardState);
 
         if (control.CanReleaseLeftMouseBePressed(Mouse.GetState()))
         {
@@ -163,8 +172,8 @@ public class LevelCreatorScene : Scene
         if (control.CanPressKeyBePressed(keyboardState, Keys.S))
             control.PressButton(Keys.S, () => cameraY += 20);
 
-        cameraX = MathHelper.Clamp(cameraX, 800, currentLevel.Width - 800);
-        cameraY = MathHelper.Clamp(cameraY, 450, currentLevel.Height - 450);
+        cameraX = MathHelper.Clamp(cameraX, (Resolution.etalonWidth / 2), currentLevel.Width - (Resolution.etalonWidth / 2));
+        cameraY = MathHelper.Clamp(cameraY, (Resolution.etalonHeight / 2), currentLevel.Height - (Resolution.etalonHeight / 2));
     }
 
     private void CreateAllWidgets()
@@ -197,6 +206,21 @@ public class LevelCreatorScene : Scene
             allModesNames.ToList(),
             x => currentMode = (Mode)Enum.Parse(typeof(Mode), allModesNames[x]));
         widgets.Add(modeChoose);
+
+        var widthInput = new NumberTextInput(new Rectangle(600, 0, 200, 50),
+            currentLevel.Width,
+            5,
+            standardFont,
+            ChangeLevelWidth);
+        widgets.Add(widthInput);
+
+        var heightInput = new NumberTextInput(new Rectangle(800, 0, 200, 50),
+            currentLevel.Height,
+            5,
+            standardFont,
+            ChangeLevelHeight);
+        widgets.Add(heightInput);
+        // TODO: made normal width and height change
     }
 
     private List<string> GetAllLevelsNames()
@@ -241,9 +265,9 @@ public class LevelCreatorScene : Scene
 
     private void CreateModeAction(MouseState mouseState)
     {
-        var gridCell = GetGridCellIndex((int)(mouseState.X + cameraX - 800), (int)(mouseState.Y + cameraY - 450));
-        if (FindCollisionObject(gridCell) != null)
-            return;
+        var gridCell = GetGridCellIndex((int)(mouseState.X + cameraX - (Resolution.etalonWidth / 2)), (int)(mouseState.Y + cameraY - (Resolution.etalonHeight / 2)));
+        //if (FindCollisionObject(gridCell) != null)
+        //    return;
         var coordinates = new Vector2(gridCell.X * gridSize, gridCell.Y * gridSize);
         var coordinatesInStrings = new string[] { coordinates.X.ToString(), coordinates.Y.ToString() };
         var objectType = TypesUtils.GetTypeFromString(currentGameObject.ToString());
@@ -251,15 +275,21 @@ public class LevelCreatorScene : Scene
         if (currentGameObject == LevelObjects.EarthBlock)
         {
             if (earthBlockCoordinates.X == float.NegativeInfinity && earthBlockCoordinates.Y == float.NegativeInfinity)
-                earthBlockCoordinates = coordinates;
+                earthBlockCoordinates = new Vector2(coordinates.X, coordinates.Y); 
             else
             {
-                if (coordinates.X > earthBlockCoordinates.X && coordinates.Y > earthBlockCoordinates.Y)
+                var earthBlockGridCell = GetGridCellIndex((int)earthBlockCoordinates.X, (int)earthBlockCoordinates.Y);
+                if (gridCell.X >= earthBlockGridCell.X && gridCell.Y >= earthBlockGridCell.Y)
                 {
-                    var width = (int)(coordinates.X - earthBlockCoordinates.X) / gridSize * gridSize + gridSize;
-                    var height = (int)(coordinates.Y - earthBlockCoordinates.Y) / gridSize * gridSize + gridSize;
-                    var blockCoordinates = new[] { earthBlockCoordinates.X.ToString(), earthBlockCoordinates.Y.ToString(),
-                    width.ToString(), height.ToString() };
+                    var width = (gridCell.X - earthBlockGridCell.X) * gridSize + gridSize;
+                    var height = (gridCell.Y - earthBlockGridCell.Y) * gridSize + gridSize;
+
+                    var blockCoordinates = new[] { 
+                        earthBlockCoordinates.X.ToString(),
+                        earthBlockCoordinates.Y.ToString(),
+                        width.ToString(),
+                        height.ToString() 
+                    };
 
                     var newGameObject = (GameObject)TypesUtils.CreateObject(typeof(EarthBlock), blockCoordinates);
                     currentLevel.AddToGameObjects(newGameObject);
@@ -279,8 +309,7 @@ public class LevelCreatorScene : Scene
 
     private void DeleteModeAction(MouseState mouseState)
     {
-        var gridCell = GetGridCellIndex((int)(mouseState.X + cameraX - 800), (int)(mouseState.Y + cameraY - 450));
-        var coordinates = new Vector2(gridCell.X * gridSize, gridCell.Y * gridSize);
+        var gridCell = GetGridCellIndex((int)(mouseState.X + cameraX - (Resolution.etalonWidth / 2)), (int)(mouseState.Y + cameraY - (Resolution.etalonHeight / 2)));
         var collisionObject = FindCollisionObject(gridCell);
         if (collisionObject != null)
             currentLevel.GameObjects.Remove(collisionObject);
@@ -301,5 +330,23 @@ public class LevelCreatorScene : Scene
                 && gridCell.Y * gridSize >= gameObject.Y && gridCell.Y * gridSize <= gameObject.Y + gameObject.Height)
                 return gameObject;
         return null;
+    }
+
+    private void ChangeLevelWidth(int width)
+    {
+        if (width >= Resolution.etalonWidth)
+        {
+            currentLevel.Width = width;
+            camera.SetNewMapSize(new System.Drawing.Size(width, currentLevel.Height));
+        }
+    }
+
+    private void ChangeLevelHeight(int height)
+    {
+        if (height >= Resolution.etalonHeight)
+        {
+            currentLevel.Height = height;
+            camera.SetNewMapSize(new System.Drawing.Size(currentLevel.Width, height));
+        }
     }
 }
