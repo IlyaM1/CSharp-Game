@@ -1,5 +1,7 @@
 ﻿using Dyhar.src.Drawing;
 using Dyhar.src.Entities.Interfaces;
+using Microsoft.Xna.Framework;
+
 namespace Dyhar.src.Entities.AbstractClasses;
 
 public abstract class Enemy : MovingGameObject, IWarrior
@@ -38,6 +40,10 @@ public abstract class Enemy : MovingGameObject, IWarrior
                 return true;
         return false;
     }
+
+    public Vector2 GetPosition() => Position;
+    public Vector2 GetSize() => new Vector2(Size.Width, Size.Height);
+    public double GetMaxHp() => maxHealthPoints;
 
     protected double maxHealthPoints = 100.0;
     protected double currentHealthPoints;

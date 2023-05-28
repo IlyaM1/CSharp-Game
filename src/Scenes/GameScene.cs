@@ -39,6 +39,10 @@ public class GameScene : Scene
         EarthBlock.sprite = content.Load<Texture2D>("Earth2");
         Sword.sprite = content.Load<Texture2D>("Sword");
         Swordsman.sprite = content.Load<Texture2D>("Swordsman");
+
+        HealthBarSprites.EmptyHpBarSprite = content.Load<Texture2D>("EmptyHpBar");
+        HealthBarSprites.greenColorSprite = content.Load<Texture2D>("GreenCube");
+
         _gridCube = content.Load<Texture2D>("GridCube1");
 
         standardFont = content.Load<SpriteFont>("galleryFont");
@@ -103,6 +107,9 @@ public class GameScene : Scene
                 if (weaponUser.IsAttacking())
                     weaponUser.GetCurrentWeapon().Draw(spriteBatch);
             }
+
+            if (TypesUtils.CanBeDownCasted<GameObject, IWarrior>(gameObject))
+                ((IWarrior)gameObject).DrawHealthBar(spriteBatch);
         }
 
         //for (var i = 0; i < currentLevel.Width; i += 50)

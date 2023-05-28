@@ -113,8 +113,9 @@ namespace Dyhar.src.Entities
         public Direction GetDirection() => directionLook;
         public Reload GetAnimationReload() => attackAnimationReload;
         public double GetCurrentHp() => currentHealthPoints;
-
-
+        public Vector2 GetPosition() => Position;
+        public Vector2 GetSize() => new Vector2(Size.Width, Size.Height);
+        public double GetMaxHp() => maxHealthPoints;
 
 
 
@@ -125,8 +126,8 @@ namespace Dyhar.src.Entities
         int JumpPower = 15;
 
         Reload multipleJumpsReload;
-        double maxHealthPoints = 100000000;
-        double currentHealthPoints = 100000000;
+        double maxHealthPoints = 200;
+        double currentHealthPoints = 200;
 
         Direction directionLook;
         MeleeWeapon currentWeapon;
