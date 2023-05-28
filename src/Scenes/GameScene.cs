@@ -78,7 +78,11 @@ public class GameScene : Scene
             foreach (var weaponUser in currentLevel.GetWeaponUsers())
                 if (weaponUser.IsAttacking())
                     if (weaponUser.GetCurrentWeapon().CheckCollision(gameObject, weaponUser.GetDirection()))
+                    {
                         gameObject.onAttacked(weaponUser.GetCurrentWeapon());
+                        weaponUser.onHitOtherWarrior(gameObject);
+                    }
+                        
 
             if (!gameObject.IsAlive)
                 currentLevel.GameObjects.Remove(gameObject);
@@ -111,10 +115,6 @@ public class GameScene : Scene
             if (TypesUtils.CanBeDownCasted<GameObject, IWarrior>(gameObject))
                 ((IWarrior)gameObject).DrawHealthBar(spriteBatch);
         }
-
-        //for (var i = 0; i < currentLevel.Width; i += 50)
-        //    for (var j = 0; j < currentLevel.Height; j += 50)
-        //        spriteBatch.Draw(_gridCube, new Rectangle(i, j, 50, 50), Color.White);
 
         spriteBatch.End();
     }

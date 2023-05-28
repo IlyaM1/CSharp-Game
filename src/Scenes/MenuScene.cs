@@ -2,6 +2,8 @@
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Content;
+using System.Collections.Generic;
+using System;
 
 namespace Dyhar.src.Scenes;
 
@@ -11,19 +13,18 @@ public class MenuScene : Scene
 
     private int selectedItemIndex;
     private string[] menuItems;
+    private Dictionary<string, Type> buttonScenes;
 
     Control.Control control = new Control.Control();
 
     public MenuScene()
     {
-        // Определение элементов меню
-        menuItems = new string[]
+        menuItems = new[] { "New Game" , "Levels creator", "Quit" };
+        buttonScenes = new Dictionary<string, Type>()
         {
-            "New Game",
-            "Load Game",
-            "Settings",
-            "Levels creator",
-            "Quit"
+            ["New Game"] = typeof(GameScene),
+            ["Levels creator"] = typeof(LevelCreatorScene),
+            ["Quit"] = null,
         };
         selectedItemIndex = 0;
     }
@@ -51,7 +52,7 @@ public class MenuScene : Scene
 
     private void IncreaseItemIndex()
     {
-        if (selectedItemIndex + 1 < menuItems.Length)
+        if (selectedItemIndex + 1 < buttonScenes.Count)
             selectedItemIndex += 1;
     }
 
@@ -78,29 +79,7 @@ public class MenuScene : Scene
 
     private void SelectMenuItem()
     {
-        // Выбор элемента меню
-        switch (selectedItemIndex)
-        {
-            case 0:
-                IsDone = true;
-                SceneToRun = typeof(GameScene);
-                break;
-            case 1:
-                IsDone = true;
-                SceneToRun = null;
-                break;
-            case 2:
-                IsDone = true;
-                SceneToRun = null;
-                break;
-            case 3:
-                IsDone = true;
-                SceneToRun = typeof(LevelCreatorScene);
-                break;
-            case 4:
-                IsDone = true;
-                SceneToRun = null;
-                break;
-        }
+        IsDone = true;
+        SceneToRun = buttonScenes[menuItems[selectedItemIndex]];
     }
 }

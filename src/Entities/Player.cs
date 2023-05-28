@@ -24,7 +24,7 @@ namespace Dyhar.src.Entities
             currentWeapon = new Sword(this);
             attackAnimationReload = new Reload(currentWeapon.AttackDuration);
             multipleJumpsReload = new Reload(10, onMultipleJumpsReloadFinish);
-            currentHealthPoints = maxHealthPoints;
+            HealthPoints = maxHealthPoints;
         }
 
         public void Dash(Camera camera)
@@ -103,21 +103,51 @@ namespace Dyhar.src.Entities
             else
                 lastAttackNumber = weapon.CurrentAttackNumber;
 
-            currentHealthPoints -= weapon.Damage;
-            if (currentHealthPoints <= 0)
+            HealthPoints -= weapon.Damage;
+            if (HealthPoints <= 0)
                 onDeath();
+        }
+
+        public void onHitOtherWarrior(GameObject gameObject)
+        {
+            if (!gameObject.IsAlive)
+                HealthPoints += vampirismPower;
         }
 
         public override Texture2D GetSprite() => sprite;
         public MeleeWeapon GetCurrentWeapon() => currentWeapon;
         public Direction GetDirection() => directionLook;
         public Reload GetAnimationReload() => attackAnimationReload;
-        public double GetCurrentHp() => currentHealthPoints;
+        public double GetCurrentHp() => HealthPoints;
         public Vector2 GetPosition() => Position;
         public Vector2 GetSize() => new Vector2(Size.Width, Size.Height);
-        public double GetMaxHp() => maxHealthPoints;
+        public double GetMaxHp() => MaxHealthPoints;
 
+        public double MaxHealthPoints
+        {
+            get => maxHealthPoints;
+            private set
+            {
+                if (value < 1)
+                    maxHealthPoints = 1;
+                else
+                    maxHealthPoints = value;
+            }
+        }
 
+        public double HealthPoints
+        {
+            get => currentHealthPoints;
+            private set
+            {
+                if (value < 0)
+                    currentHealthPoints = 0;
+                else if (value > maxHealthPoints)
+                    currentHealthPoints = maxHealthPoints;
+                else
+                    currentHealthPoints = value;
+            }
+        }
 
 
         bool IsInJump = false;
@@ -139,6 +169,8 @@ namespace Dyhar.src.Entities
         private bool canDash => dashReload.State == ReloadState.NotStarted;
         Reload dashAnimationReload = new Reload(50);
         Reload dashReload = new Reload(2000);
+
+        int vampirismPower = 30; // How much we heal after defeating enemy
 
         void CheckAllReloads(GameTime gameTime)
         {
