@@ -1,0 +1,17 @@
+2000 1200
+Player 0 100
+EarthBlock 400 150 650 300
+Swordsman 600 0
+Swordsman 950 50
+EarthBlock 0 600 200 300
+EarthBlock 500 600 300 300
+EarthBlock 1150 600 250 250
+EarthBlock 1350 100 150 100
+Swordsman 50 450
+Swordsman 700 500
+Swordsman 1300 500
+EarthBlock 1500 750 150 100
+EarthBlock 1700 1000 150 100
+EarthBlock 1500 400 150 100
+EarthBlock 1700 100 200 100
+EarthBlock 1150 250 100 100

@@ -16,23 +16,23 @@ public abstract class GameObject
     public Rectangle Rectangle => new Rectangle((int)X, (int)Y, Size.Width, Size.Height);
     public int Width => Size.Width;
     public int Height => Size.Height;
-    public bool IsAlive { get => isAlive; protected set { isAlive = value; } }
+    public bool IsAlive { get => _isAlive; protected set { _isAlive = value; } }
 
     public bool IsSolid { get; protected set; }
 
-    public virtual void onUpdate(GameTime gameTime) { }
-    public virtual void onCollision(GameObject collisionObject) { }
+    public virtual void UpdatingEventHandler(GameTime gameTime) { }
+    public virtual void CollisionedEventHandler(GameObject collisionObject) { }
 
     public abstract Texture2D GetSprite();
 
     public virtual bool CheckCollision(GameObject otherObject)
     {
-        return CheckCollision(X, Y, Size, otherObject.X, otherObject.Y, otherObject.Size);
+        return _сheckCollision(X, Y, Size, otherObject.X, otherObject.Y, otherObject.Size);
     }
 
-    public virtual void onAttacked(MeleeWeapon weapon) { }
+    public virtual void GotAttackedEventHandler(MeleeWeapon weapon) { }
 
-    public virtual void onDeath()
+    public virtual void DyingEventHandler()
     {
         IsAlive = false;
     }
@@ -42,9 +42,9 @@ public abstract class GameObject
         spriteBatch.Draw(GetSprite(), Position, Color.White);
     }
 
-    private bool isAlive = true;
+    private bool _isAlive = true;
 
-    private bool CheckCollision(double firstObjectX, double firstObjectY, SizeF firstObjectSize,
+    private bool _сheckCollision(double firstObjectX, double firstObjectY, SizeF firstObjectSize,
         double secondObjectX, double secondObjectY, SizeF secondObjectSize)
     {
         var isCollisionFromLeft = firstObjectX + firstObjectSize.Width > secondObjectX;

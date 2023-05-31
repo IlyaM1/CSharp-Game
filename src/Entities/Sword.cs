@@ -9,16 +9,15 @@ namespace Dyhar.src.Entities;
 
 public class Sword : MeleeWeapon
 {
-    public static Texture2D sprite;
+    public static Texture2D Sprite;
 
     public Sword(IWeaponUser attacker) : base(attacker)
     {
         Damage = 35;
     }
 
-    public override int WeaponLength => sprite.Width + 5;
-
-    public override Texture2D GetSprite() => sprite;
+    public override int WeaponLength => Sprite.Width + 5;
+    public override Texture2D GetSprite() => Sprite;
 
     public override void Draw(SpriteBatch spriteBatch)
     {
@@ -38,14 +37,14 @@ public class Sword : MeleeWeapon
                 endAngle = MathHelper.Pi + MathHelper.PiOver2;
             }
 
-            var angle = MathHelper.Lerp(startAngle, endAngle, animationTimer / AttackDuration);
+            var angle = MathHelper.Lerp(startAngle, endAngle, _animationTimer / AttackDuration);
 
-            var swordPosition = Attacker.FindWeaponStart() + new Vector2(0f, -sprite.Height / 2f);
-            swordPosition += new Vector2(0f, -sprite.Height / 2f) * (float)Math.Sin(angle);
+            var swordPosition = Attacker.GetWeaponStartPosition() + new Vector2(0f, -Sprite.Height / 2f);
+            swordPosition += new Vector2(0f, -Sprite.Height / 2f) * (float)Math.Sin(angle);
 
-            spriteBatch.Draw(sprite, swordPosition, null, Color.White, angle, Vector2.Zero, 1f, SpriteEffects.None, 0f);
+            spriteBatch.Draw(Sprite, swordPosition, null, Color.White, angle, Vector2.Zero, 1f, SpriteEffects.None, 0f);
         }
     }
 
-    private float animationTimer => (float)Attacker.GetAnimationReload().PassedTime.TotalMilliseconds;
+    private float _animationTimer => (float)Attacker.GetAnimationReload().PassedTimeInMilliseconds.TotalMilliseconds;
 }

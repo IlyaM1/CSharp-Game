@@ -1,2 +1,2 @@
-﻿var dyhar = new Dyhar.Dyhar();
+﻿var dyhar = Dyhar.Dyhar.GetInstance();
 dyhar.Run();

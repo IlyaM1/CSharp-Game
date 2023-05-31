@@ -1,0 +1,50 @@
+2000 5000
+EarthBlock 0 200 1150 250
+Player 0 100
+Swordsman 250 100
+Swordsman 600 100
+Swordsman 900 100
+Swordsman 1100 100
+EarthBlock 1150 200 700 250
+EarthBlock 500 800 1500 350
+EarthBlock 0 1400 1450 400
+EarthBlock 400 1900 1600 400
+EarthBlock 0 2050 300 250
+EarthBlock 0 2450 1900 350
+EarthBlock 400 3250 1600 200
+EarthBlock 0 3600 1400 50
+EarthBlock 1350 3650 50 1350
+EarthBlock 0 3650 1350 1000
+Swordsman 1550 100
+Swordsman 1850 650
+Swordsman 1100 700
+Swordsman 750 500
+Swordsman 550 600
+Swordsman 50 1150
+Swordsman 650 1200
+Swordsman 1900 1250
+Swordsman 1700 1700
+Swordsman 1100 1800
+Swordsman 650 1800
+Swordsman 400 1800
+Swordsman 50 1950
+Swordsman 100 2350
+Swordsman 1000 2350
+Swordsman 1800 2350
+Swordsman 1950 3100
+Swordsman 1000 3000
+Swordsman 550 2850
+Swordsman 1350 3000
+Swordsman 50 3500
+Swordsman 850 3500
+Swordsman 1350 3500
+Swordsman 1550 4400
+Swordsman 1850 4800
+Swordsman 50 4800
+Swordsman 650 4800
+Swordsman 1100 4850
+Swordsman 1250 4750
+Swordsman 350 4800
+Swordsman 150 4700
+Swordsman 500 4750
+Swordsman 950 4700

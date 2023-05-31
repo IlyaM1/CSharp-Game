@@ -5,9 +5,8 @@ using System.IO;
 using System;
 using System.Linq;
 using Dyhar.src.Utils;
-using Dyhar.src.Entities;
 
-namespace Dyhar.src.Level;
+namespace Dyhar.src.Levels;
 
 public static class LevelParser
 {

@@ -11,20 +11,20 @@ namespace Dyhar.src.Entities
 {
     public class Player : MovingGameObject, IWarrior, IWeaponUser
     {
-        public static Texture2D sprite;
+        public static Texture2D Sprite;
 
         public Player(int x, int y)
         {
             X = x; 
             Y = y;
-            Speed = 16.0f;
+            Speed = 12.0f;
             Force = new Vector2(0, 0);
             IsSolid = false;
-            directionLook = Direction.Right;
-            currentWeapon = new Sword(this);
-            attackAnimationReload = new Reload(currentWeapon.AttackDuration);
-            multipleJumpsReload = new Reload(10, onMultipleJumpsReloadFinish);
-            HealthPoints = maxHealthPoints;
+            _directionLook = Direction.Right;
+            _currentWeapon = new Sword(this);
+            _attackAnimationReload = new Reload(_currentWeapon.AttackDuration);
+            _multipleJumpsReload = new Reload(1000, _multipleJumpsReloadedEventHandler);
+            HealthPoints = _maxHealthPoints;
         }
 
         public void Dash(Camera camera)
@@ -32,92 +32,86 @@ namespace Dyhar.src.Entities
             if (camera is null)
                 throw new ArgumentNullException("Camera in control not setted");
 
-            if (canDash)
+            if (_canDash)
             {
-                Force.X += directionLook == Direction.Right ? dashPower : -dashPower;
+                Force.X += _directionLook == Direction.Right ? _dashPower : -_dashPower;
 
-                dashAnimationReload.Start();
-                dashReload.Start();
+                _dashAnimationReload.Start();
+                _dashReload.Start();
             } 
         }
 
-        public void MoveHorizontally(Direction direction)
+        public override void MoveHorizontally(Direction direction)
         {
-            directionLook = direction;
-
-            if (direction == Direction.Left)
-                Force.X -= Speed;
-            else if (direction == Direction.Right)
-                Force.X += Speed;
-            else
-                throw new ArgumentException("Impossible Direction");
+            _directionLook = direction;
+            base.MoveHorizontally(direction);
         }
 
         public void Jump()
         {
-            if (!IsInJump)
+            if (!_isInJump)
             {
-                IsInJump = true;
-                Force.Y = -JumpPower;
+                _isInJump = true;
+                Force.Y = -_jumpPower;
                 return;
             }
-            else if (IsInJump && numberOfExtraJumps > 0)
+            else if (_isInJump && _numberOfExtraJumps > 0)
             {
-                numberOfExtraJumps -= 1;
-                multipleJumpsReload.Start();
-                Force.Y = -JumpPower;
+                _numberOfExtraJumps -= 1;
+                _multipleJumpsReload.Start();
+                Force.Y = -_jumpPower;
                 return;
             }
         }
 
-        public override void onIsOnGround()
+        public override void FalledOnGroundEventHandler()
         {
-            IsInJump = false;
+            _isInJump = false;
         }
 
-        public override void onUpdate(GameTime gameTime)
+        public override void UpdatingEventHandler(GameTime gameTime)
         {
-            CheckAllReloads(gameTime);
+            _checkAllReloads(gameTime);
         }
 
-        public Vector2 FindWeaponStart()
+        public Vector2 GetWeaponStartPosition()
         {
-            if (directionLook == Direction.Right)
+            if (_directionLook == Direction.Right)
                 return new Vector2((float)(X + Size.Width), (float)(Y + (Size.Height / 2)));
-            if (directionLook == Direction.Left)
+            if (_directionLook == Direction.Left)
                 return new Vector2((float)(X), (float)(Y + (Size.Height / 2)));
 
             throw new Exception("Impossible Direction");
         }
 
-        public void onAttack()
+        public void AttackingEventHandler()
         {
-            currentWeapon.onAttack();
-            attackAnimationReload.Start();
+            _currentWeapon.AttackingEventHandler();
+            _attackAnimationReload.Start();
         }
 
-        public override void onAttacked(MeleeWeapon weapon)
+        public override void GotAttackedEventHandler(MeleeWeapon weapon)
         {
-            if (lastAttackNumber == weapon.CurrentAttackNumber)
+            if (_lastAttackNumber == weapon.CurrentAttackNumber)
                 return;
             else
-                lastAttackNumber = weapon.CurrentAttackNumber;
+                _lastAttackNumber = weapon.CurrentAttackNumber;
 
             HealthPoints -= weapon.Damage;
             if (HealthPoints <= 0)
-                onDeath();
+                DyingEventHandler();
         }
 
-        public void onHitOtherWarrior(GameObject gameObject)
+        public void HittedOtherWarriorEventHandler(GameObject gameObject)
         {
             if (!gameObject.IsAlive)
-                HealthPoints += vampirismPower;
+                HealthPoints += _vampirismPower;
         }
 
-        public override Texture2D GetSprite() => sprite;
-        public MeleeWeapon GetCurrentWeapon() => currentWeapon;
-        public Direction GetDirection() => directionLook;
-        public Reload GetAnimationReload() => attackAnimationReload;
+        public override Texture2D GetSprite() => Sprite;
+        public MeleeWeapon GetCurrentWeapon() => _currentWeapon;
+        public Direction GetDirection() => _directionLook;
+        public Reload GetAnimationReload() => _attackAnimationReload;
         public double GetCurrentHp() => HealthPoints;
         public Vector2 GetPosition() => Position;
         public Vector2 GetSize() => new Vector2(Size.Width, Size.Height);
@@ -125,68 +119,68 @@ namespace Dyhar.src.Entities
 
         public double MaxHealthPoints
         {
-            get => maxHealthPoints;
+            get => _maxHealthPoints;
             private set
             {
                 if (value < 1)
-                    maxHealthPoints = 1;
+                    _maxHealthPoints = 1;
                 else
-                    maxHealthPoints = value;
+                    _maxHealthPoints = value;
             }
         }
 
         public double HealthPoints
         {
-            get => currentHealthPoints;
+            get => _currentHealthPoints;
             private set
             {
                 if (value < 0)
-                    currentHealthPoints = 0;
-                else if (value > maxHealthPoints)
-                    currentHealthPoints = maxHealthPoints;
+                    _currentHealthPoints = 0;
+                else if (value > _maxHealthPoints)
+                    _currentHealthPoints = _maxHealthPoints;
                 else
-                    currentHealthPoints = value;
+                    _currentHealthPoints = value;
             }
         }
 
 
-        bool IsInJump = false;
-        int numberOfExtraJumps = 1;
-        int maxNumberOfExtraJumps = 1;
-        int JumpPower = 15;
+        private bool _isInJump = false;
+        private int _numberOfExtraJumps = 1;
+        private int _maxNumberOfExtraJumps = 1;
+        private int _jumpPower = 15;
 
-        Reload multipleJumpsReload;
-        double maxHealthPoints = 200;
-        double currentHealthPoints = 200;
+        private Reload _multipleJumpsReload;
+        private double _maxHealthPoints = 200;
+        private double _currentHealthPoints = 200;
 
-        Direction directionLook;
-        MeleeWeapon currentWeapon;
-        Reload attackAnimationReload;
+        private Direction _directionLook;
+        private MeleeWeapon _currentWeapon;
+        private Reload _attackAnimationReload;
 
-        private ulong lastAttackNumber = 0;
+        private ulong _lastAttackNumber = 0;
 
-        private int dashPower = 800;
-        private bool canDash => dashReload.State == ReloadState.NotStarted;
-        Reload dashAnimationReload = new Reload(50);
-        Reload dashReload = new Reload(2000);
+        private int _dashPower = 300;
+        private bool _canDash => _dashReload.State == ReloadState.NotStarted;
+        private Reload _dashAnimationReload = new Reload(50);
+        private Reload _dashReload = new Reload(700);
 
-        int vampirismPower = 30; // How much we heal after defeating enemy
+        private int _vampirismPower = 30; // How much we heal after defeating enemy
 
-        void CheckAllReloads(GameTime gameTime)
+        private void _checkAllReloads(GameTime gameTime)
         {
-            multipleJumpsReload.OnUpdate(gameTime);
-            attackAnimationReload.OnUpdate(gameTime);
-            dashAnimationReload.OnUpdate(gameTime);
-            dashReload.OnUpdate(gameTime);
+            _multipleJumpsReload.UpdatingEventHandler(gameTime);
+            _attackAnimationReload.UpdatingEventHandler(gameTime);
+            _dashAnimationReload.UpdatingEventHandler(gameTime);
+            _dashReload.UpdatingEventHandler(gameTime);
         }
 
-        void onMultipleJumpsReloadFinish()
+        private void _multipleJumpsReloadedEventHandler()
         {
-            if (numberOfExtraJumps < maxNumberOfExtraJumps)
+            if (_numberOfExtraJumps < _maxNumberOfExtraJumps)
             {
-                numberOfExtraJumps += 1;
-                if (numberOfExtraJumps < maxNumberOfExtraJumps)
-                    multipleJumpsReload.Start();
+                _numberOfExtraJumps += 1;
+                if (_numberOfExtraJumps < _maxNumberOfExtraJumps)
+                    _multipleJumpsReload.Start();
             }
         }
     }

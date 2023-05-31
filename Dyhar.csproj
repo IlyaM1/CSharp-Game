@@ -11,9 +11,9 @@
     <ApplicationIcon>Icon.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Remove="src\Level\LevelFiles\**" />
-    <EmbeddedResource Remove="src\Level\LevelFiles\**" />
-    <None Remove="src\Level\LevelFiles\**" />
+    <Compile Remove="src\Levels\LevelFiles\**" />
+    <EmbeddedResource Remove="src\Levels\LevelFiles\**" />
+    <None Remove="src\Levels\LevelFiles\**" />
   </ItemGroup>
   <ItemGroup>
     <None Remove="Icon.ico" />

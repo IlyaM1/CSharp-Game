@@ -4,32 +4,32 @@ using System;
 
 namespace Dyhar.src.Control;
 
-public class Control
+public class InputManager
 {
     public List<Keys> PressedKeys { get; set; }
     public bool IsPressedLeftMouse { get; set; }
 
-    public Control()
+    public InputManager()
     {
         PressedKeys = new List<Keys>();
         IsPressedLeftMouse = false;
     }
 
-    public bool CanReleaseKeyBePressed(KeyboardState keyboardState, Keys key)
+    public bool IsKeyDown(KeyboardState keyboardState, Keys key)
     {
         if (keyboardState.IsKeyDown(key) && !PressedKeys.Contains(key))
             return true;
         return false;
     }
 
-    public bool CanPressKeyBePressed(KeyboardState keyboardState, Keys key)
+    public bool IsKeyHold(KeyboardState keyboardState, Keys key)
     {
         if (keyboardState.IsKeyDown(key))
             return true;
         return false;
     }
 
-    public bool CanReleaseLeftMouseBePressed(MouseState mouseState)
+    public bool IsMouseLeftDown(MouseState mouseState)
     {
         return mouseState.LeftButton == ButtonState.Pressed && !IsPressedLeftMouse;
     }

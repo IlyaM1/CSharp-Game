@@ -2,68 +2,50 @@
 using Microsoft.Xna.Framework.Input;
 using System;
 using Dyhar.src.Mechanics;
-using System.Collections.Generic;
 using Dyhar.src.Drawing;
 
 namespace Dyhar.src.Control
 {
-    public sealed class GameControl
+    public class GameControl
     {
-        Player player;
-        Camera camera;
+        private Player _player;
+        private Camera _camera;
 
-        Control control = new Control();
+        private InputManager _control = new InputManager();
 
-        public GameControl() { }
-
-        public GameControl(Player player) : this()
+        public void Update(MouseState mouseState, KeyboardState keyboardState)
         {
-            this.player = player;
-        }
-
-        public GameControl(Camera camera)
-        {
-            this.camera = camera;
-        }
-
-        public GameControl(Player player, Camera camera) : this(player)
-        {
-            this.camera = camera;
-        }
-
-        public void onUpdate(MouseState mouseState, KeyboardState keyboardState)
-        {
-            if (player == null)
+            if (_player == null)
                 throw new Exception("Player isn't setted in control");
 
-            if (control.CanPressKeyBePressed(keyboardState, Keys.A))
-                control.PressButton(Keys.A, () => player.MoveHorizontally(Direction.Left));
+            if (_control.IsKeyHold(keyboardState, Keys.A))
+                _control.PressButton(Keys.A, () => _player.MoveHorizontally(Direction.Left));
 
-            if (control.CanPressKeyBePressed(keyboardState, Keys.D))
-                control.PressButton(Keys.D, () => player.MoveHorizontally(Direction.Right));
+            if (_control.IsKeyHold(keyboardState, Keys.D))
+                _control.PressButton(Keys.D, () => _player.MoveHorizontally(Direction.Right));
 
-            if (control.CanReleaseKeyBePressed(keyboardState, Keys.W))
-                control.PressButton(Keys.W, () => player.Jump());
+            if (_control.IsKeyDown(keyboardState, Keys.W))
+                _control.PressButton(Keys.W, () => _player.Jump());
 
-            if (control.CanReleaseKeyBePressed(keyboardState, Keys.LeftShift))
-                control.PressButton(Keys.LeftShift, () => player.Dash(camera));
+            if (_control.IsKeyDown(keyboardState, Keys.LeftShift))
+                _control.PressButton(Keys.LeftShift, () => _player.Dash(_camera));
 
 
-            if (control.CanReleaseLeftMouseBePressed(mouseState))
-                control.PressLeftMouse(() => player.onAttack());
+            if (_control.IsMouseLeftDown(mouseState))
+                _control.PressLeftMouse(() => _player.AttackingEventHandler());
 
-            control.RemoveUnpressedKeys(keyboardState);
-            control.UnpressLeftMouse(mouseState);
+            _control.RemoveUnpressedKeys(keyboardState);
+            _control.UnpressLeftMouse(mouseState);
         }
 
         public void SetPlayer(Player player)
         {
-            this.player = player;
+            _player = player;
         }
 
-        public void setCamera(Camera camera)
+        public void SetCamera(Camera camera)
         {
-            this.camera = camera;
+            _camera = camera;
         }
     }
 }

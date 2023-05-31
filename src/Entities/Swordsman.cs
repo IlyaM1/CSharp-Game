@@ -1,100 +1,151 @@
 ﻿using Dyhar.src.Entities.AbstractClasses;
 using Dyhar.src.Entities.Interfaces;
 using Dyhar.src.Mechanics;
+using Dyhar.src.Utils;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using System;
 
 namespace Dyhar.src.Entities;
 
 public class Swordsman : Enemy, IWeaponUser
 {
-    public override void onPlayerScreen(Player player)
+    public Swordsman(int x, int y) : base(x, y)
     {
-        if (player.X <= X)
-        {
-            if ((player.Position - Position).Length() >= 120)
-                X -= 5;
-            direction = Direction.Left;
-        }
-        else if (player.X > X)
-        {
-            if ((player.Position - Position).Length() >= 120)
-                X += 5;
-            direction = Direction.Right;
-        }
+        _sword = new Sword(this);
+        Speed = 9;
+        _sword.AttackDuration = 1000;
+        _attackAnimationReload = new Reload(_sword.AttackDuration);
+    }
 
-        Jump();
+    public override void PlayerEnteredScreenEventHandler(Player player)
+    {
+        if (BotStates.Wander == CurrentState && (Y >= player.Y - 40 && Y <= player.Y + 40))
+            UpdateState(BotStates.Chase);
 
-        // TODO: Make Jump when it's needed
-
-        if (attackAnimationReload.State == ReloadState.NotStarted 
-            && delayBetweenAttacks.State == ReloadState.NotStarted)
+        if (CurrentState == BotStates.Chase)
         {
-            onAttack();
+            var distanceToPlayer = (player.Position - Position).Length();
+            if (player.X <= X)
+                _direction = Direction.Left;
+            else if (player.X > X)
+                _direction = Direction.Right;
+
+            if (player.Y < Y)
+                Jump();
+
+            if (distanceToPlayer < _sword.WeaponLength - 20)
+                UpdateState(BotStates.Attack);
         }
+    }
+
+    public override void UpdateState(BotStates nextState)
+    {
+        CurrentState = nextState;
+        switch (nextState)
+        {
+            case BotStates.Wander:
+                Speed = 5;
+                break;
+            case BotStates.Chase:
+                Speed = 10;
+                break;
+            case BotStates.Attack:
+                Speed = 0;
+                break;
+        }
+    }
+
+    private void ExecuteState()
+    {
+        switch (CurrentState)
+        {
+            default:
+                break;
+            case BotStates.Idle:
+                break;
+            case BotStates.Wander:
+            case BotStates.Chase:
+                MoveHorizontally(_direction);
+                break;
+            case BotStates.Attack:
+                AttackingEventHandler();
+                UpdateState(BotStates.Chase);
+                break;
+        }
+    }
+
+    public override void CollisionedEventHandler(GameObject collisionObject)
+    {
+        if (CurrentState == BotStates.Wander && TypesUtils.CanBeDownCasted<GameObject, Player>(collisionObject))
+        {
+            if (collisionObject.X + collisionObject.Width <= X)
+                _direction = Direction.Right;
+            else if (collisionObject.X >= X+Width)
+                _direction = Direction.Left;
+        }
+    }
+
+    public override void MoveHorizontally(Direction direction)
+    {
+        this._direction = direction;
+        base.MoveHorizontally(direction);
     }
 
     public void Jump()
     {
-        if (!IsInJump)
+        if (!_isInJump)
         {
-            IsInJump = true;
-            Force.Y = -JumpPower;
+            _isInJump = true;
+            Force.Y = -_jumpPower;
             return;
         }
     }
 
-
-    public override void onUpdate(GameTime gameTime)
+    public override void UpdatingEventHandler(GameTime gameTime)
     {
-        CheckAllReloads(gameTime);  
+        _checkAllReloads(gameTime);
+        ExecuteState();
     }
 
-    public static Texture2D sprite;
-
-    public Swordsman(int x, int y) : base(x, y)
+    public void AttackingEventHandler()
     {
-        sword = new Sword(this);
-        sword.AttackDuration = 500;
-        attackAnimationReload = new Reload(sword.AttackDuration);
+        if (_attackAnimationReload.State == ReloadState.NotStarted 
+            && _delayBetweenAttacks.State == ReloadState.NotStarted)
+        {
+            _sword.AttackingEventHandler();
+            _attackAnimationReload.Start();
+            _delayBetweenAttacks.Start();
+        } 
     }
 
-    public override Texture2D GetSprite() => sprite;
-    public override double GetCurrentHp() => currentHealthPoints;
-
-    public Vector2 FindWeaponStart()
+    public override void FalledOnGroundEventHandler()
     {
-        return new Vector2(X + 20, Y + 20);
+        _isInJump = false;
     }
 
-    public void onAttack()
+    public static Texture2D Sprite;
+
+    public override Texture2D GetSprite() => Sprite;
+    public override double GetCurrentHp() => CurrentHealthPoints;
+    public Vector2 GetWeaponStartPosition() => new Vector2(X + 20, Y + 20);
+    public MeleeWeapon GetCurrentWeapon() => _sword;
+    public Direction GetDirection() => _direction;
+    public Reload GetAnimationReload() => _attackAnimationReload;
+
+
+    private Direction _direction = new Random().Next(10) >= 5 ? Direction.Left : Direction.Right;
+    private MeleeWeapon _sword;
+    private Reload _attackAnimationReload;
+
+    private bool _isInJump = false;
+    private int _jumpPower = 18;
+
+    private void _checkAllReloads(GameTime gameTime)
     {
-        sword.onAttack();
-        attackAnimationReload.Start();
-        delayBetweenAttacks.Start();
+        _attackAnimationReload.UpdatingEventHandler(gameTime);
+        _delayBetweenAttacks.UpdatingEventHandler(gameTime);
     }
 
-    public override void onIsOnGround()
-    {
-        IsInJump = false;
-    }
-
-    private Direction direction = Direction.Left;
-    private MeleeWeapon sword;
-    private Reload attackAnimationReload;
-
-    public MeleeWeapon GetCurrentWeapon() => sword;
-    public Direction GetDirection() => direction;
-    public Reload GetAnimationReload() => attackAnimationReload;
-
-    bool IsInJump = false;
-    int JumpPower = 18;
-
-    void CheckAllReloads(GameTime gameTime)
-    {
-        attackAnimationReload.OnUpdate(gameTime);
-        delayBetweenAttacks.OnUpdate(gameTime);
-    }
-
-    private Reload delayBetweenAttacks = new Reload(1000);
+    private Reload _delayBetweenAttacks = new Reload(1000);
 }

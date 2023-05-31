@@ -16,64 +16,64 @@ public class Reload
 {
     public ReloadState State { get; private set; }
     public int ReloadTimeInMilliseconds { get; set; }
-    public TimeSpan PassedTime => CurrentTime - StartTime;
+    public TimeSpan PassedTimeInMilliseconds => CurrentTimeInMilliseconds - StartTimeInMilliseconds;
 
     public Reload(int reloadTimeInMilliseconds)
     {
         ReloadTimeInMilliseconds = reloadTimeInMilliseconds;
         State = ReloadState.NotStarted;
-        finishAction = TypesUtils.EmptyFunction;
+        _finishAction = TypesUtils.EmptyFunction;
     }
 
     public Reload(int reloadTimeInMilliseconds, Action finishAction) 
         : this(reloadTimeInMilliseconds)
     {
-        this.finishAction = finishAction;
+        _finishAction = finishAction;
     }
 
     public void Start()
     {
-        wasStartedWithoutTime = true;
+        _wasStartedWithoutTime = true;
     }
 
-    public void OnUpdate(GameTime gameTime)
+    public void UpdatingEventHandler(GameTime gameTime)
     {
-        if (wasStartedWithoutTime)
+        if (_wasStartedWithoutTime)
         {
-            Start(gameTime);
-            wasStartedWithoutTime = false;
+            _start(gameTime);
+            _wasStartedWithoutTime = false;
         }
 
         if (State == ReloadState.Reloading)
         {
-            CurrentTime = gameTime.TotalGameTime;
-            if (CurrentTime > EndTime)
+            CurrentTimeInMilliseconds = gameTime.TotalGameTime;
+            if (CurrentTimeInMilliseconds > EndTimeInMilliseconds)
                 State = ReloadState.Finished;
         }
 
         if (State == ReloadState.Finished)
         {
-            finishAction();
+            _finishAction();
             State = ReloadState.NotStarted;
         }
     }
 
-    private TimeSpan StartTime { get; set; }
-    private TimeSpan CurrentTime { get; set; }
-    private TimeSpan EndTime { get; set; }
+    private TimeSpan StartTimeInMilliseconds { get; set; }
+    private TimeSpan CurrentTimeInMilliseconds { get; set; }
+    private TimeSpan EndTimeInMilliseconds { get; set; }
 
-    private bool wasStartedWithoutTime = false;
-    private Action finishAction;
+    private bool _wasStartedWithoutTime = false;
+    private Action _finishAction;
 
-    private void Start(GameTime gameTime)
+    private void _start(GameTime gameTime)
     {
         if (State != ReloadState.NotStarted)
             return;
 
-        StartTime = gameTime.TotalGameTime;
+        StartTimeInMilliseconds = gameTime.TotalGameTime;
         if (ReloadTimeInMilliseconds == 0)
             throw new ArgumentException();
-        EndTime = StartTime + new TimeSpan(0, 0, 0, ReloadTimeInMilliseconds / 1000, ReloadTimeInMilliseconds % 1000);
+        EndTimeInMilliseconds = StartTimeInMilliseconds + new TimeSpan(0, 0, 0, ReloadTimeInMilliseconds / 1000, ReloadTimeInMilliseconds % 1000);
         State = ReloadState.Reloading;
     }
 }

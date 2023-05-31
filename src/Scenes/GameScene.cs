@@ -4,6 +4,7 @@ using Dyhar.src.Entities.AbstractClasses;
 using Dyhar.src.Entities.Interfaces;
 using Dyhar.src.Entities;
 using Dyhar.src.Utils;
+using Dyhar.src.Levels;
 
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -14,20 +15,9 @@ namespace Dyhar.src.Scenes;
 
 public class GameScene : Scene
 {
-    SpriteFont standardFont;
-
-    Player player;
-    GameControl control = new GameControl();
-    Camera camera;
-
-    int levelNumber = 1;
-    Level.Level currentLevel;
-
-    Texture2D _gridCube;
-
     public GameScene()
     {
-        currentLevel = Level.Level.CreateLevelFromFile("Level1", control, out player);
+        _currentLevel = Level.CreateLevelFromFile("Level1", _control, out _player);
 
         //this.IsFixedTimeStep = true;//false;
         //this.TargetElapsedTime = TimeSpan.FromSeconds(1d / 30d); //60);
@@ -35,20 +25,18 @@ public class GameScene : Scene
 
     public override void LoadContent(ContentManager content, GraphicsDevice graphics)
     {
-        Player.sprite = content.Load<Texture2D>("player");
-        EarthBlock.sprite = content.Load<Texture2D>("Earth2");
-        Sword.sprite = content.Load<Texture2D>("Sword");
-        Swordsman.sprite = content.Load<Texture2D>("Swordsman");
+        Player.Sprite = content.Load<Texture2D>("player");
+        EarthBlock.Sprite = content.Load<Texture2D>("Earth2");
+        Sword.Sprite = content.Load<Texture2D>("Sword");
+        Swordsman.Sprite = content.Load<Texture2D>("Swordsman");
 
         HealthBarSprites.EmptyHpBarSprite = content.Load<Texture2D>("EmptyHpBar");
-        HealthBarSprites.greenColorSprite = content.Load<Texture2D>("GreenCube");
+        HealthBarSprites.GreenColorSprite = content.Load<Texture2D>("GreenCube");
 
-        _gridCube = content.Load<Texture2D>("GridCube1");
+        _standardFont = content.Load<SpriteFont>("galleryFont");
 
-        standardFont = content.Load<SpriteFont>("galleryFont");
-
-        camera = new Camera(graphics.Viewport, currentLevel.Width, currentLevel.Height);
-        control.setCamera(camera);
+        _camera = new Camera(graphics.Viewport, _currentLevel.Width, _currentLevel.Height);
+        _control.SetCamera(_camera);
     }
 
     public override void Update(GameTime gameTime)
@@ -59,50 +47,48 @@ public class GameScene : Scene
             SceneToRun = typeof(MenuScene);
         }
 
+        _control.Update(Mouse.GetState(), Keyboard.GetState());
 
-        control.onUpdate(Mouse.GetState(), Keyboard.GetState());
-
-        for (var i = 0; i < currentLevel.GameObjects.Count; i++)
+        for (var i = 0; i < _currentLevel.GameObjects.Count; i++)
         {
-            var gameObject = currentLevel.GameObjects[i];
+            var gameObject = _currentLevel.GameObjects[i];
             if (TypesUtils.CanBeDownCasted<GameObject, MovingGameObject>(gameObject))
-                currentLevel.Physics.Move((MovingGameObject)gameObject);
+                _currentLevel.Physics.HandleObjectMovementAndCollisions((MovingGameObject)gameObject);
 
             if (TypesUtils.CanBeDownCasted<GameObject, Enemy>(gameObject))
             {
                 var enemy = (Enemy)gameObject;
-                if (enemy.IsOnPlayerScreen(camera))
-                    enemy.onPlayerScreen(player);
+                if (enemy.IsOnPlayerScreen(_camera))
+                    enemy.PlayerEnteredScreenEventHandler(_player);
             }
 
-            foreach (var weaponUser in currentLevel.GetWeaponUsers())
+            foreach (var weaponUser in _currentLevel.GetWeaponUsers())
                 if (weaponUser.IsAttacking())
                     if (weaponUser.GetCurrentWeapon().CheckCollision(gameObject, weaponUser.GetDirection()))
                     {
-                        gameObject.onAttacked(weaponUser.GetCurrentWeapon());
-                        weaponUser.onHitOtherWarrior(gameObject);
+                        gameObject.GotAttackedEventHandler(weaponUser.GetCurrentWeapon());
+                        weaponUser.HittedOtherWarriorEventHandler(gameObject);
                     }
                         
 
             if (!gameObject.IsAlive)
-                currentLevel.GameObjects.Remove(gameObject);
+                _currentLevel.GameObjects.Remove(gameObject);
 
-            gameObject.onUpdate(gameTime);
+            gameObject.UpdatingEventHandler(gameTime);
         }
 
-        if (player.X + 200 >= currentLevel.Width)
-            if (currentLevel.EnemyCount == 0)
-                NextLevel();
+        if (_checkIfLevelEnded())
+            _moveOnNextLevel();
     }
 
     public override void Draw(SpriteBatch spriteBatch)
     {
-        camera.Update(player.Position);
-        spriteBatch.Begin(transformMatrix: camera.Transform);
+        _camera.Update(_player.Position);
+        spriteBatch.Begin(transformMatrix: _camera.Transform);
 
-        for (var i = 0; i < currentLevel.GameObjects.Count; i++)
+        for (var i = 0; i < _currentLevel.GameObjects.Count; i++)
         {
-            var gameObject = currentLevel.GameObjects[i];
+            var gameObject = _currentLevel.GameObjects[i];
             gameObject.Draw(spriteBatch);
 
             if (TypesUtils.CanBeDownCasted<GameObject, IWeaponUser>(gameObject))
@@ -119,10 +105,28 @@ public class GameScene : Scene
         spriteBatch.End();
     }
 
-    private void NextLevel()
+
+    private SpriteFont _standardFont;
+
+    private Player _player;
+    private GameControl _control = new GameControl();
+    private Camera _camera;
+
+    private int _levelNumber = 1;
+    private Level _currentLevel;
+
+    private bool _checkIfLevelEnded()
     {
-        levelNumber += 1;
-        currentLevel = Level.Level.CreateLevelFromFile("Level" + levelNumber.ToString(), control, out player);
-        camera.SetNewMapSize(new System.Drawing.Size(currentLevel.Width, currentLevel.Height));
+        if (_player.X + 200 >= _currentLevel.Width)
+            if (_currentLevel.EnemyCount == 0)
+                return true;
+        return false;
+    }
+
+    private void _moveOnNextLevel()
+    {
+        _levelNumber += 1;
+        _currentLevel = Level.CreateLevelFromFile("Level" + _levelNumber.ToString(), _control, out _player);
+        _camera.SetNewMapSize(new System.Drawing.Size(_currentLevel.Width, _currentLevel.Height));
     }
 }

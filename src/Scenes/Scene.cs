@@ -8,7 +8,7 @@ namespace Dyhar.src.Scenes;
 
 public abstract class Scene
 {
-    protected KeyboardState prevKeyboardState;
+    protected KeyboardState PreviousKeyboardState;
 
     public bool IsDone { get; protected set; }
     public Type SceneToRun { get; protected set; }

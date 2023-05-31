@@ -3,32 +3,18 @@ using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework;
 using System.Collections.Generic;
 using System;
-using Dyhar.src.Entities;
 using Dyhar.src.Utils;
 using Dyhar.src.Drawing;
+using Dyhar.src.Control;
 
 namespace Dyhar.src.UI;
 
 public class DropdownList : Widget
 {
-    private readonly SpriteFont _font;
-    private readonly List<string> _options;
-    private string _selectedOption;
-    private bool _isOpen;
-    Texture2D _backgroundSprite;
-    Texture2D _elementsSprite;
-
-    Rectangle Rectangle;
-
-    public int X => Rectangle.X;
-    public int Y => Rectangle.Y;
-    public int Width => Rectangle.Width;
-    public int Height => Rectangle.Height;
-
-    private Vector2 drawPosition = new Vector2(0, 0);
-    private Rectangle drawRectangle => new Rectangle((int)drawPosition.X, (int)drawPosition.Y, Width, Height);
-
-    Action<int> _actionWhenEdited;
+    public int X => _rectangle.X;
+    public int Y => _rectangle.Y;
+    public int Width => _rectangle.Width;
+    public int Height => _rectangle.Height;
 
     public DropdownList(Rectangle rectangle, Texture2D backgroundSprite, Texture2D elementsSprite,
         SpriteFont font, List<string> options, Action<int> actionWhenEdited)
@@ -37,29 +23,27 @@ public class DropdownList : Widget
         _options = options;
         _selectedOption = options[0];
         _isOpen = false;
-        Rectangle = rectangle;
+        _rectangle = rectangle;
         _backgroundSprite = backgroundSprite;
         _actionWhenEdited = actionWhenEdited;
         _elementsSprite = elementsSprite;
     }
 
-    public override void Update(Camera camera, Control.Control control, MouseState mouseState, KeyboardState keyboardState)
+    public override void Update(Camera camera, InputManager control, MouseState mouseState, KeyboardState keyboardState)
     {
-        drawPosition = camera.ScreenPositionToMapPosition(new Vector2(X, Y));
+        _drawPosition = camera.ConvertScreenPositionToMapPosition(new Vector2(X, Y));
 
-        // Open the list if clicked
-        if (control.CanReleaseLeftMouseBePressed(mouseState))
-            if (Rectangle.Contains(mouseState.Position))
+        if (control.IsMouseLeftDown(mouseState))
+            if (_rectangle.Contains(mouseState.Position))
                 control.PressLeftMouse(() => _isOpen = !_isOpen);
 
-        // Select an element if clicked
         if (_isOpen)
         {
             for (var i = 0; i < _options.Count; i++)
             {
                 var optionBounds = new Rectangle(X, Y + Height * (i + 1), Width, Height);
 
-                if (control.CanReleaseLeftMouseBePressed(mouseState))
+                if (control.IsMouseLeftDown(mouseState))
                 {
                     if (optionBounds.Contains(mouseState.Position))
                     {
@@ -67,7 +51,7 @@ public class DropdownList : Widget
                         _selectedOption = _options[i];
                         _actionWhenEdited(i);
                         _isOpen = false;
-                        break; // Exit the loop if an option is selected
+                        break;
                     }
                 }
             }
@@ -76,18 +60,28 @@ public class DropdownList : Widget
 
     public override void Draw(SpriteBatch spriteBatch)
     {
-        // Draw the selected option
-        spriteBatch.Draw(_backgroundSprite, drawRectangle, Color.White);
-        spriteBatch.DrawString(_font, _selectedOption, new Vector2(drawPosition.X + 5, drawPosition.Y + 5), Color.Black);
+        spriteBatch.Draw(_backgroundSprite, _drawRectangle, Color.White);
+        spriteBatch.DrawString(_font, _selectedOption, new Vector2(_drawPosition.X + 5, _drawPosition.Y + 5), Color.Black);
 
-        // Draw the options if the list is open
         if (_isOpen)
         {
             for (int i = 0; i < _options.Count; i++)
             {
-                spriteBatch.Draw(_elementsSprite, new Rectangle((int)drawPosition.X, (int)(drawPosition.Y + Height * (i + 1)), Width, Height), Color.White);
-                spriteBatch.DrawString(_font, _options[i], new Vector2(drawPosition.X + 5, drawPosition.Y + 5 + (i + 1) * Height), Color.Black);
+                spriteBatch.Draw(_elementsSprite, new Rectangle((int)_drawPosition.X, (int)(_drawPosition.Y + Height * (i + 1)), Width, Height), Color.White);
+                spriteBatch.DrawString(_font, _options[i], new Vector2(_drawPosition.X + 5, _drawPosition.Y + 5 + (i + 1) * Height), Color.Black);
             }
         }
     }
+
+    private readonly SpriteFont _font;
+    private readonly List<string> _options;
+    private string _selectedOption;
+    private bool _isOpen;
+    private Texture2D _backgroundSprite;
+    private Texture2D _elementsSprite;
+    private Action<int> _actionWhenEdited;
+
+    private Rectangle _rectangle;
+    private Vector2 _drawPosition = new Vector2(0, 0);
+    private Rectangle _drawRectangle => new Rectangle((int)_drawPosition.X, (int)_drawPosition.Y, Width, Height);
 }

@@ -3,7 +3,7 @@ using System;
 using System.IO;
 using System.Text;
 
-namespace Dyhar.src.Level;
+namespace Dyhar.src.Levels;
 
 public static class LevelDeserialization
 {

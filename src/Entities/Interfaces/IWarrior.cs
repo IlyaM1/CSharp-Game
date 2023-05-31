@@ -27,7 +27,7 @@ public interface IWarrior
         //    new Rectangle((int)leftPoint.X, (int)leftPoint.Y, (int)healthBarSize.X, (int)healthBarSize.Y),
         //    Color.White);
 
-        spriteBatch.Draw(HealthBarSprites.greenColorSprite,
+        spriteBatch.Draw(HealthBarSprites.GreenColorSprite,
             new Rectangle((int)leftPoint.X, (int)leftPoint.Y, (int)greenLineSize.X, (int)greenLineSize.Y),
             Color.White);
     }

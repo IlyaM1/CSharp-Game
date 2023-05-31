@@ -22,7 +22,7 @@ public abstract class MeleeWeapon
         CurrentAttackNumber = 0;
     }
 
-    public virtual void onAttack()
+    public virtual void AttackingEventHandler()
     {
         CurrentAttackNumber++;
     }
@@ -32,11 +32,11 @@ public abstract class MeleeWeapon
         if (gameObject == Attacker)
             return false;
 
-        var attackPoint = Attacker.FindWeaponStart();
+        var attackPoint = Attacker.GetWeaponStartPosition();
 
         if ((direction == Direction.Right && attackPoint.X <= gameObject.X) 
             || (direction == Direction.Left && attackPoint.X >= gameObject.X))
-            return IntersectsCircleRectangle(attackPoint, WeaponLength, gameObject.Rectangle);
+            return _intersectsCircleRectangle(attackPoint, WeaponLength, gameObject.Rectangle);
 
         return false;
     }
@@ -44,7 +44,7 @@ public abstract class MeleeWeapon
     public abstract Texture2D GetSprite();
     public abstract void Draw(SpriteBatch spriteBatch);
 
-    private bool IntersectsCircleRectangle(Vector2 circleCenter, float radius, Rectangle rectangle)
+    private bool _intersectsCircleRectangle(Vector2 circleCenter, float radius, Rectangle rectangle)
     {
         var clampedX = Math.Max(rectangle.Left, Math.Min(circleCenter.X, rectangle.Right));
         var clampedY = Math.Max(rectangle.Top, Math.Min(circleCenter.Y, rectangle.Bottom));
