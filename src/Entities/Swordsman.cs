@@ -45,7 +45,7 @@ public class Swordsman : Enemy, IWeaponUser
         switch (nextState)
         {
             case BotStates.Wander:
-                Speed = 5;
+                Speed = 3;
                 break;
             case BotStates.Chase:
                 Speed = 10;
@@ -65,6 +65,10 @@ public class Swordsman : Enemy, IWeaponUser
             case BotStates.Idle:
                 break;
             case BotStates.Wander:
+                if (X == 0)
+                    _direction = _direction == Direction.Left ? Direction.Right : Direction.Left;
+                MoveHorizontally(_direction);
+                break;
             case BotStates.Chase:
                 MoveHorizontally(_direction);
                 break;
@@ -77,7 +81,7 @@ public class Swordsman : Enemy, IWeaponUser
 
     public override void CollisionedEventHandler(GameObject collisionObject)
     {
-        if (CurrentState == BotStates.Wander && TypesUtils.CanBeDownCasted<GameObject, Player>(collisionObject))
+        if (CurrentState == BotStates.Wander && TypesUtils.CanBeDownCasted<GameObject, EarthBlock>(collisionObject))
         {
             if (collisionObject.X + collisionObject.Width <= X)
                 _direction = Direction.Right;
@@ -88,7 +92,7 @@ public class Swordsman : Enemy, IWeaponUser
 
     public override void MoveHorizontally(Direction direction)
     {
-        this._direction = direction;
+        _direction = direction;
         base.MoveHorizontally(direction);
     }
 

@@ -22,7 +22,7 @@ public class Dyhar : Game
         _graphics.PreferredBackBufferWidth = Resolution.ActualWidth;
         _graphics.PreferredBackBufferHeight = Resolution.ActualHeight;
         _graphics.ApplyChanges();
-
+        
         base.Initialize();
     }
 

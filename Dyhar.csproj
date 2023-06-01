@@ -9,11 +9,10 @@
   <PropertyGroup>
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <ApplicationIcon>Icon.ico</ApplicationIcon>
+    <BaseOutputPath>bin</BaseOutputPath>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Remove="src\Levels\LevelFiles\**" />
-    <EmbeddedResource Remove="src\Levels\LevelFiles\**" />
-    <None Remove="src\Levels\LevelFiles\**" />
+    <Content Include="LevelFiles\*.*" CopyToOutputDirectory="Always" />
   </ItemGroup>
   <ItemGroup>
     <None Remove="Icon.ico" />

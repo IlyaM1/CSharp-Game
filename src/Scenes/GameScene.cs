@@ -10,6 +10,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
+using System.IO;
 
 namespace Dyhar.src.Scenes;
 
@@ -18,7 +19,7 @@ public class GameScene : Scene
     public GameScene()
     {
         _currentLevel = Level.CreateLevelFromFile("Level1", _control, out _player);
-
+        _levelAmount = Directory.GetFiles("LevelFiles").Length;
         //this.IsFixedTimeStep = true;//false;
         //this.TargetElapsedTime = TimeSpan.FromSeconds(1d / 30d); //60);
     }
@@ -69,15 +70,15 @@ public class GameScene : Scene
                         gameObject.GotAttackedEventHandler(weaponUser.GetCurrentWeapon());
                         weaponUser.HittedOtherWarriorEventHandler(gameObject);
                     }
-                        
+                            
 
             if (!gameObject.IsAlive)
-                _currentLevel.GameObjects.Remove(gameObject);
+                _currentLevel.RemoveFromGameObjects(gameObject);
 
             gameObject.UpdatingEventHandler(gameTime);
         }
 
-        if (_checkIfLevelEnded())
+        if (_checkIfLevelEnded() && _levelNumber < _levelAmount)
             _moveOnNextLevel();
     }
 
@@ -113,6 +114,7 @@ public class GameScene : Scene
     private Camera _camera;
 
     private int _levelNumber = 1;
+    private int _levelAmount = 1;
     private Level _currentLevel;
 
     private bool _checkIfLevelEnded()

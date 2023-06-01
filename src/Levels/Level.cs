@@ -67,13 +67,15 @@ public class Level
         if (gameObject == null)
             throw new ArgumentNullException($"{gameObject} that you want to add in game objects is null");
         GameObjects.Add(gameObject);
-        _enemyCount++;
+        if (gameObject is Enemy)
+            _enemyCount++;
     }
 
     public void RemoveFromGameObjects(GameObject gameObject)
     {
         GameObjects.Remove(gameObject);
-        _enemyCount--;
+        if (gameObject is Enemy)
+            _enemyCount--;
     }
 
     public List<IWeaponUser> GetWeaponUsers()
