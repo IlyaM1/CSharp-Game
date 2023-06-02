@@ -82,8 +82,8 @@ public class Level
     {
         var result = new List<IWeaponUser>();
         foreach (var gameObject in GameObjects)
-            if (TypesUtils.CanBeDownCasted<GameObject, IWeaponUser>(gameObject))
-                result.Add((IWeaponUser)gameObject);
+            if (gameObject is IWeaponUser weaponUser)
+                result.Add(weaponUser);
         return result;
     }
 

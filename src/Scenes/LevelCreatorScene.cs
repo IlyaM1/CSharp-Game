@@ -139,12 +139,9 @@ public class LevelCreatorScene : Scene
             var gameObject = currentLevel.GameObjects[i];
             gameObject.Draw(spriteBatch);
 
-            if (TypesUtils.CanBeDownCasted<GameObject, IWeaponUser>(gameObject))
-            {
-                var weaponUser = (IWeaponUser)gameObject;
+            if (gameObject is IWeaponUser weaponUser)
                 if (weaponUser.IsAttacking())
                     weaponUser.GetCurrentWeapon().Draw(spriteBatch);
-            }
         }
 
         for (var i = 0; i < currentLevel.Width; i += gridSize)

@@ -23,7 +23,9 @@ public abstract class Enemy : MovingGameObject, IWarrior
         else
             LastAttackNumber = weapon.CurrentAttackNumber;
 
-        CurrentHealthPoints -= weapon.Damage;
+        if (weapon.Attacker is Player)
+            CurrentHealthPoints -= weapon.Damage;
+
         if (CurrentHealthPoints <= 0)
             DyingEventHandler();
     }

@@ -53,15 +53,12 @@ public class GameScene : Scene
         for (var i = 0; i < _currentLevel.GameObjects.Count; i++)
         {
             var gameObject = _currentLevel.GameObjects[i];
-            if (TypesUtils.CanBeDownCasted<GameObject, MovingGameObject>(gameObject))
-                _currentLevel.Physics.HandleObjectMovementAndCollisions((MovingGameObject)gameObject);
+            if (gameObject is MovingGameObject movingGameObject)
+                _currentLevel.Physics.HandleObjectMovementAndCollisions(movingGameObject);
 
-            if (TypesUtils.CanBeDownCasted<GameObject, Enemy>(gameObject))
-            {
-                var enemy = (Enemy)gameObject;
+            if (gameObject is Enemy enemy)
                 if (enemy.IsOnPlayerScreen(_camera))
                     enemy.PlayerEnteredScreenEventHandler(_player);
-            }
 
             foreach (var weaponUser in _currentLevel.GetWeaponUsers())
                 if (weaponUser.IsAttacking())
@@ -92,15 +89,12 @@ public class GameScene : Scene
             var gameObject = _currentLevel.GameObjects[i];
             gameObject.Draw(spriteBatch);
 
-            if (TypesUtils.CanBeDownCasted<GameObject, IWeaponUser>(gameObject))
-            {
-                var weaponUser = (IWeaponUser)gameObject;
+            if (gameObject is IWeaponUser weaponUser)
                 if (weaponUser.IsAttacking())
                     weaponUser.GetCurrentWeapon().Draw(spriteBatch);
-            }
 
-            if (TypesUtils.CanBeDownCasted<GameObject, IWarrior>(gameObject))
-                ((IWarrior)gameObject).DrawHealthBar(spriteBatch);
+            if (gameObject is IWarrior warrior)
+                warrior.DrawHealthBar(spriteBatch);
         }
 
         spriteBatch.End();

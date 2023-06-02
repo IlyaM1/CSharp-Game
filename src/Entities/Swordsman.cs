@@ -81,7 +81,7 @@ public class Swordsman : Enemy, IWeaponUser
 
     public override void CollisionedEventHandler(GameObject collisionObject)
     {
-        if (CurrentState == BotStates.Wander && TypesUtils.CanBeDownCasted<GameObject, EarthBlock>(collisionObject))
+        if (CurrentState == BotStates.Wander && collisionObject is EarthBlock)
         {
             if (collisionObject.X + collisionObject.Width <= X)
                 _direction = Direction.Right;
