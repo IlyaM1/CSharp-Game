@@ -1,10 +1,6 @@
 6000 1000
 Player 0 900
-EarthBlock 400 600 500 400
-EarthBlock 450 200 450 300
 Swordsman 750 100
-Swordsman 650 500
-Swordsman 350 500
 Swordsman 500 500
 EarthBlock 200 400 100 100
 EarthBlock 1100 250 550 250
@@ -18,7 +14,6 @@ EarthBlock 4700 700 650 250
 EarthBlock 5300 150 400 400
 Swordsman 1800 700
 Swordsman 1450 700
-Swordsman 1650 600
 Swordsman 1500 150
 Swordsman 1250 150
 Swordsman 200 250
@@ -32,3 +27,4 @@ Swordsman 4350 850
 Swordsman 4950 550
 Swordsman 5550 800
 Swordsman 5800 500
+EarthBlock 400 700 400 300

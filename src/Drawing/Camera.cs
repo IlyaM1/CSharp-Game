@@ -34,8 +34,8 @@ public class Camera
         var maxY = _mapHeight - smallestHeight / 2;
 
         Position = new Vector2(
-            MathHelper.Clamp(Position.X + (position.X - Position.X)*0.1f, minX, maxX),
-            MathHelper.Clamp(Position.Y + (position.Y - Position.Y)*0.1f, minY, maxY)
+            MathHelper.Clamp(Position.X + (position.X - Position.X) * 0.1f, minX, maxX),
+            MathHelper.Clamp(Position.Y + (position.Y - Position.Y) * 0.1f, minY, maxY)
         );
 
         Transform = Matrix.CreateTranslation(new Vector3(-Position.X, -Position.Y, 0)) *

@@ -20,11 +20,12 @@ namespace Dyhar.src.Entities
             Speed = 12.0f;
             Force = new Vector2(0, 0);
             IsSolid = false;
+            HealthPoints = _maxHealthPoints;
+
             _directionLook = Direction.Right;
             _currentWeapon = new Sword(this);
             _attackAnimationReload = new Reload(_currentWeapon.AttackDuration);
             _multipleJumpsReload = new Reload(1000, _multipleJumpsReloadedEventHandler);
-            HealthPoints = _maxHealthPoints;
         }
 
         public void Dash(Camera camera)
@@ -120,27 +121,13 @@ namespace Dyhar.src.Entities
         public double MaxHealthPoints
         {
             get => _maxHealthPoints;
-            private set
-            {
-                if (value < 1)
-                    _maxHealthPoints = 1;
-                else
-                    _maxHealthPoints = value;
-            }
+            private set => _maxHealthPoints = Math.Max(value, 1);
         }
 
         public double HealthPoints
         {
             get => _currentHealthPoints;
-            private set
-            {
-                if (value < 0)
-                    _currentHealthPoints = 0;
-                else if (value > _maxHealthPoints)
-                    _currentHealthPoints = _maxHealthPoints;
-                else
-                    _currentHealthPoints = value;
-            }
+            private set => _currentHealthPoints = MathHelper.Clamp((float)value, 0, (float)_maxHealthPoints);
         }
 
 
@@ -150,8 +137,8 @@ namespace Dyhar.src.Entities
         private int _jumpPower = 15;
 
         private Reload _multipleJumpsReload;
-        private double _maxHealthPoints = 200;
-        private double _currentHealthPoints = 200;
+        private double _maxHealthPoints = 300;
+        private double _currentHealthPoints = 300;
 
         private Direction _directionLook;
         private MeleeWeapon _currentWeapon;

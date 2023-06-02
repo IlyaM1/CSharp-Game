@@ -11,30 +11,31 @@ namespace Dyhar.src.UI;
 
 public class DropdownList : Widget
 {
-    public int X => _rectangle.X;
-    public int Y => _rectangle.Y;
-    public int Width => _rectangle.Width;
-    public int Height => _rectangle.Height;
+    public Rectangle Rectangle { get; private set; }
+    public int X => Rectangle.X;
+    public int Y => Rectangle.Y;
+    public int Width => Rectangle.Width;
+    public int Height => Rectangle.Height;
 
-    public DropdownList(Rectangle rectangle, Texture2D backgroundSprite, Texture2D elementsSprite,
-        SpriteFont font, List<string> options, Action<int> actionWhenEdited)
+    public static Texture2D BackgroundSprite;
+    public static Texture2D ElementsSprite;
+    public static SpriteFont Font;
+
+    public DropdownList(Rectangle rectangle, List<string> options, Action<int> actionWhenEdited)
     {
-        _font = font;
         _options = options;
         _selectedOption = options[0];
         _isOpen = false;
-        _rectangle = rectangle;
-        _backgroundSprite = backgroundSprite;
         _actionWhenEdited = actionWhenEdited;
-        _elementsSprite = elementsSprite;
+        Rectangle = rectangle;
     }
 
-    public override void Update(Camera camera, InputManager control, MouseState mouseState, KeyboardState keyboardState)
+    public override void UpdateEventHandler(Camera camera, InputManager control, MouseState mouseState, KeyboardState keyboardState)
     {
         _drawPosition = camera.ConvertScreenPositionToMapPosition(new Vector2(X, Y));
 
         if (control.IsMouseLeftDown(mouseState))
-            if (_rectangle.Contains(mouseState.Position))
+            if (Rectangle.Contains(mouseState.Position))
                 control.PressLeftMouse(() => _isOpen = !_isOpen);
 
         if (_isOpen)
@@ -60,28 +61,26 @@ public class DropdownList : Widget
 
     public override void Draw(SpriteBatch spriteBatch)
     {
-        spriteBatch.Draw(_backgroundSprite, _drawRectangle, Color.White);
-        spriteBatch.DrawString(_font, _selectedOption, new Vector2(_drawPosition.X + 5, _drawPosition.Y + 5), Color.Black);
+        spriteBatch.Draw(BackgroundSprite, _drawRectangle, Color.White);
+        spriteBatch.DrawString(Font, _selectedOption, new Vector2(_drawPosition.X + 5, _drawPosition.Y + 5), Color.Black);
 
         if (_isOpen)
         {
             for (int i = 0; i < _options.Count; i++)
             {
-                spriteBatch.Draw(_elementsSprite, new Rectangle((int)_drawPosition.X, (int)(_drawPosition.Y + Height * (i + 1)), Width, Height), Color.White);
-                spriteBatch.DrawString(_font, _options[i], new Vector2(_drawPosition.X + 5, _drawPosition.Y + 5 + (i + 1) * Height), Color.Black);
+                spriteBatch.Draw(ElementsSprite, new Rectangle((int)_drawPosition.X, (int)(_drawPosition.Y + Height * (i + 1)), Width, Height), Color.White);
+                spriteBatch.DrawString(Font, _options[i], new Vector2(_drawPosition.X + 5, _drawPosition.Y + 5 + (i + 1) * Height), Color.Black);
             }
         }
     }
 
-    private readonly SpriteFont _font;
+    
     private readonly List<string> _options;
     private string _selectedOption;
     private bool _isOpen;
-    private Texture2D _backgroundSprite;
-    private Texture2D _elementsSprite;
+    
     private Action<int> _actionWhenEdited;
 
-    private Rectangle _rectangle;
     private Vector2 _drawPosition = new Vector2(0, 0);
     private Rectangle _drawRectangle => new Rectangle((int)_drawPosition.X, (int)_drawPosition.Y, Width, Height);
 }

@@ -8,35 +8,34 @@ namespace Dyhar.src.UI;
 
 public class Label : Widget
 {
+    public Rectangle Rectangle { get; private set; }
     public string Text { get; set; }
+    public static SpriteFont Font { get; set; }
 
-    public Label(string text, int startX, int startY, int width, int height, SpriteFont font)
+    public Label(string text, int startX, int startY, int width, int height)
     {
         Text = text;
-        _rectangle = new Rectangle(startX, startY, width, height);
-        _font = font;
+        Rectangle = new Rectangle(startX, startY, width, height);
         _drawPosition = new Vector2(startX, startY);
     }
 
     public Label(string text, Rectangle rectangle, SpriteFont font)
     {
         Text = text;
-        _rectangle = rectangle;
-        _font = font;
+        Rectangle = rectangle;
+        Font = font;
         _drawPosition = new Vector2(rectangle.X, rectangle.Y);
     }
 
     public override void Draw(SpriteBatch spriteBatch)
     {
-        spriteBatch.DrawString(_font, Text, _drawPosition, Color.White);
+        spriteBatch.DrawString(Font, Text, _drawPosition, Color.White);
     }
 
-    public override void Update(Camera camera, InputManager control, MouseState mouseState, KeyboardState keyboardState)
+    public override void UpdateEventHandler(Camera camera, InputManager control, MouseState mouseState, KeyboardState keyboardState)
     {
-        _drawPosition = camera.ConvertScreenPositionToMapPosition(new Vector2(_rectangle.X, _rectangle.Y));
+        _drawPosition = camera.ConvertScreenPositionToMapPosition(new Vector2(Rectangle.X, Rectangle.Y));
     }
 
-    private Rectangle _rectangle { get; set; }
-    private SpriteFont _font { get; set; }
     private Vector2 _drawPosition = new Vector2(0, 0);
 }

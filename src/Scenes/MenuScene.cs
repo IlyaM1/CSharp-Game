@@ -19,6 +19,10 @@ public class MenuScene : Scene
             ["Levels creator"] = typeof(LevelCreatorScene),
             ["Quit"] = null,
         };
+
+        for (var i = 0; i < _menuItems.Length; i++)
+            _menuItemsRectangles.Add(new Rectangle(50, 50 + i * 50, 200, 50));
+
         _selectedItemIndex = 0;
     }
 
@@ -29,28 +33,35 @@ public class MenuScene : Scene
 
     public override void Update(GameTime gameTime)
     {
-        if (_control.IsKeyDown(Keyboard.GetState(), Keys.Up))
+        var keyboardState = Keyboard.GetState();
+        var mouseState = Mouse.GetState();
+
+        if (_control.IsKeyDown(keyboardState, Keys.Up))
             _control.PressButton(Keys.Up, () => _decreaseItemIndex());
 
-        if (_control.IsKeyDown(Keyboard.GetState(), Keys.Down))
+        if (_control.IsKeyDown(keyboardState, Keys.Down))
             _control.PressButton(Keys.Down, () => _increaseItemIndex());
 
-        if (_control.IsKeyDown(Keyboard.GetState(), Keys.Enter))
+        if (_control.IsKeyDown(keyboardState, Keys.Enter))
             _control.PressButton(Keys.Enter, () => _selectMenuItem());
 
-        _control.RemoveUnpressedKeys(Keyboard.GetState());
-        // TODO: Make support of Mouse
-        // control.UnpressLeftMouse(Mouse.GetState());
+        if (_control.IsMouseLeftDown(mouseState))
+            for (var i = 0; i < _menuItemsRectangles.Count; i++)
+                if (_menuItemsRectangles[i].Contains(mouseState.X, mouseState.Y))
+                    _control.PressLeftMouse(() =>  _selectMenuItem(i));
+
+        _control.RemoveUnpressedKeys(keyboardState);
+        _control.UnpressLeftMouse(Mouse.GetState());
     }
 
     public override void Draw(SpriteBatch spriteBatch)
     {
         spriteBatch.Begin();
 
-        // Отображение всех элементов меню с подсветкой выбранного элемента
         for (int i = 0; i < _menuItems.Length; i++)
         {
-            var position = new Vector2(50, 50 + i * 50);
+            var currentRectangle = _menuItemsRectangles[i];
+            var position = new Vector2(currentRectangle.X, currentRectangle.Y);
             var color = i == _selectedItemIndex ? Color.Yellow : Color.White;
             spriteBatch.DrawString(_standardFont, _menuItems[i], position, color);
         }
@@ -63,6 +74,7 @@ public class MenuScene : Scene
 
     private int _selectedItemIndex;
     private string[] _menuItems;
+    private List<Rectangle> _menuItemsRectangles = new List<Rectangle>();
     private Dictionary<string, Type> _buttonScenes;
 
     private InputManager _control = new InputManager();
@@ -81,7 +93,11 @@ public class MenuScene : Scene
 
     private void _selectMenuItem()
     {
-        IsDone = true;
-        SceneToRun = _buttonScenes[_menuItems[_selectedItemIndex]];
+        RunNewScene(_buttonScenes[_menuItems[_selectedItemIndex]]);
+    }
+
+    private void _selectMenuItem(int index)
+    {
+        RunNewScene(_buttonScenes[_menuItems[index]]);
     }
 }

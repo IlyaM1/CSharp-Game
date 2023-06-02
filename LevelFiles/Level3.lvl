@@ -15,3 +15,12 @@ EarthBlock 1700 1000 150 100
 EarthBlock 1500 400 150 100
 EarthBlock 1700 100 200 100
 EarthBlock 1150 250 100 100
+EarthBlock 0 1100 2000 100
+EarthBlock 0 900 50 150
+EarthBlock 0 1050 50 50
+EarthBlock 1700 950 50 50
+EarthBlock 1700 450 200 650
+Swordsman 100 1000
+Swordsman 950 1000
+Swordsman 1500 1000
+Swordsman 1850 0

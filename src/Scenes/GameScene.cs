@@ -34,8 +34,6 @@ public class GameScene : Scene
         HealthBarSprites.EmptyHpBarSprite = content.Load<Texture2D>("EmptyHpBar");
         HealthBarSprites.GreenColorSprite = content.Load<Texture2D>("GreenCube");
 
-        _standardFont = content.Load<SpriteFont>("galleryFont");
-
         _camera = new Camera(graphics.Viewport, _currentLevel.Width, _currentLevel.Height);
         _control.SetCamera(_camera);
     }
@@ -43,16 +41,14 @@ public class GameScene : Scene
     public override void Update(GameTime gameTime)
     {
         if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
-        {
-            IsDone = true;
-            SceneToRun = typeof(MenuScene);
-        }
+            RunNewScene(typeof(MenuScene));
 
         _control.Update(Mouse.GetState(), Keyboard.GetState());
 
         for (var i = 0; i < _currentLevel.GameObjects.Count; i++)
         {
             var gameObject = _currentLevel.GameObjects[i];
+
             if (gameObject is MovingGameObject movingGameObject)
                 _currentLevel.Physics.HandleObjectMovementAndCollisions(movingGameObject);
 
@@ -68,10 +64,9 @@ public class GameScene : Scene
                         weaponUser.HittedOtherWarriorEventHandler(gameObject);
                     }
                             
-
             if (!gameObject.IsAlive)
                 _currentLevel.RemoveFromGameObjects(gameObject);
-
+                
             gameObject.UpdatingEventHandler(gameTime);
         }
 
@@ -100,8 +95,6 @@ public class GameScene : Scene
         spriteBatch.End();
     }
 
-
-    private SpriteFont _standardFont;
 
     private Player _player;
     private GameControl _control = new GameControl();

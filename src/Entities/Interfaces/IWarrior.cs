@@ -21,14 +21,14 @@ public interface IWarrior
 
         var leftPoint = new Vector2(position.X - 20, position.Y - 40);
         var healthBarSize = new Vector2(size.X + 40, 20);
-        var greenLineSize = new Vector2((float)((currentHp / maxHp) * healthBarSize.X), 20);
+        var greenLineSize = new Vector2((float)((currentHp / maxHp) * healthBarSize.X)-2, 18);
 
-        //spriteBatch.Draw(HealthBarSprites.EmptyHpBarSprite,
-        //    new Rectangle((int)leftPoint.X, (int)leftPoint.Y, (int)healthBarSize.X, (int)healthBarSize.Y),
-        //    Color.White);
+        spriteBatch.Draw(HealthBarSprites.EmptyHpBarSprite,
+            new Rectangle((int)leftPoint.X, (int)leftPoint.Y, (int)healthBarSize.X, (int)healthBarSize.Y),
+            Color.White);
 
         spriteBatch.Draw(HealthBarSprites.GreenColorSprite,
-            new Rectangle((int)leftPoint.X, (int)leftPoint.Y, (int)greenLineSize.X, (int)greenLineSize.Y),
+            new Rectangle((int)leftPoint.X + 1, (int)leftPoint.Y + 1, (int)greenLineSize.X, (int)greenLineSize.Y),
             Color.White);
     }
 }

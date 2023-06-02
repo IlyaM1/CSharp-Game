@@ -36,20 +36,20 @@ public class LevelCreatorScene : Scene
 {
     public LevelCreatorScene()
     {
-        currentLevel = Level.CreateLevelFromFile(levelName);
+        _currentLevel = Level.CreateLevelFromFile(_levelName);
     }
 
     public override void Draw(SpriteBatch spriteBatch)
     {
-        spriteBatch.Begin(transformMatrix: camera.Transform);
+        spriteBatch.Begin(transformMatrix: _camera.Transform);
 
         _drawLevel(spriteBatch);
 
-        foreach (var widget in widgets)
+        foreach (var widget in _widgets)
             widget.Draw(spriteBatch);
 
         spriteBatch.End();
-        camera.Update(cameraPosition);
+        _camera.Update(_cameraPosition);
     }
 
     public override void LoadContent(ContentManager content, GraphicsDevice graphics)
@@ -58,14 +58,19 @@ public class LevelCreatorScene : Scene
         EarthBlock.Sprite = content.Load<Texture2D>("Earth2");
         Sword.Sprite = content.Load<Texture2D>("Sword");
         Swordsman.Sprite = content.Load<Texture2D>("Swordsman");
+
         _gridCube = content.Load<Texture2D>("GridCube1");
 
-        standardFont = content.Load<SpriteFont>("galleryFont");
+        var standardFont = content.Load<SpriteFont>("galleryFont");
 
-        dropdownMenuSprite = content.Load<Texture2D>("DropdownWidget");
-        dropdownMenuElementSprite = content.Load<Texture2D>("DropdownWidgetElement");
+        DropdownList.Font = standardFont;
+        DropdownList.ElementsSprite = content.Load<Texture2D>("DropdownWidgetElement");
+        DropdownList.BackgroundSprite = content.Load<Texture2D>("DropdownWidget");
 
-        camera = new Camera(graphics.Viewport, currentLevel.Width, currentLevel.Height);
+        NumberTextInput.Font = standardFont;
+        Label.Font = standardFont;
+
+        _camera = new Camera(graphics.Viewport, _currentLevel.Width, _currentLevel.Height);
 
         _createAllWidgets();
     }
@@ -74,69 +79,64 @@ public class LevelCreatorScene : Scene
     {
         if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
         {
-            IsDone = true;
-            SceneToRun = typeof(MenuScene);
-            var levelString = LevelDeserialization.DeserializeLevel(currentLevel);
-            if (levelName == "New level")
-                levelName = "Level" + (levelNames.Count()).ToString();
-            if (_checkIfPlayerAlreadyExists() && currentLevel.EnemyCount > 0)
-                LevelDeserialization.WriteToFile(levelName, levelString.ToString());
+            RunNewScene(typeof(MenuScene));
+
+            var levelString = LevelDeserialization.DeserializeLevel(_currentLevel);
+            if (_levelName == "New level")
+                _levelName = "Level" + (levelNames.Count()).ToString();
+            if (_checkIfPlayerAlreadyExists() && _currentLevel.EnemyCount > 0)
+                LevelDeserialization.WriteToFile(_levelName, levelString.ToString());
         }
 
         var mouseState = Mouse.GetState();
         var keyboardState = Keyboard.GetState();
 
-        foreach (var widget in widgets)
-            widget.Update(camera, control, mouseState, keyboardState);
+        foreach (var widget in _widgets)
+            widget.UpdateEventHandler(_camera, _control, mouseState, keyboardState);
 
         _moveCameraUpdate(keyboardState);
 
-        if (control.IsMouseLeftDown(Mouse.GetState()))
+        if (_control.IsMouseLeftDown(Mouse.GetState()))
         {
             if (currentMode == Mode.Creating)
-                control.PressLeftMouse(() => _createModeAction(mouseState));
+                _control.PressLeftMouse(() => _createModeAction(mouseState));
             if (currentMode == Mode.Deleting)
-                control.PressLeftMouse(() => _deleteModeAction(mouseState));
+                _control.PressLeftMouse(() => _deleteModeAction(mouseState));
         }
 
-        control.RemoveUnpressedKeys(keyboardState);
-        control.UnpressLeftMouse(mouseState);
+        _control.RemoveUnpressedKeys(keyboardState);
+        _control.UnpressLeftMouse(mouseState);
     }
 
 
 
-    private Level currentLevel;
-    private string levelName = "Level1";
-
-    private Camera camera;
-    private Texture2D _gridCube;
-    private SpriteFont standardFont;
-    private float cameraX = Resolution.EtalonWidth / 2;
-    private float cameraY = Resolution.EtalonHeight / 2;
-    private Vector2 cameraPosition => new Vector2(cameraX, cameraY);
-
-    private InputManager control = new InputManager();
-
-    private List<Widget> widgets = new List<Widget>();
-    private Texture2D dropdownMenuSprite;
-    private Texture2D dropdownMenuElementSprite;
-
+    private Level _currentLevel;
+    private string _levelName = "Level1";
     private List<string> levelNames;
-    private int gridSize = 50;
-
     private LevelObjects currentGameObject = LevelObjects.Player;
     private Mode currentMode = Mode.Creating;
 
-    private NumberTextInput widthInput;
-    private NumberTextInput heightInput;
+    private Camera _camera;
+    private float _cameraX = Resolution.EtalonWidth / 2;
+    private float _cameraY = Resolution.EtalonHeight / 2;
+    private Vector2 _cameraPosition => new Vector2(_cameraX, _cameraY);
 
-    private Vector2 earthBlockCoordinates = new Vector2(float.NegativeInfinity, float.NegativeInfinity);
+    private InputManager _control = new InputManager();
+
+    private List<Widget> _widgets = new List<Widget>();
+    private NumberTextInput _widthInput;
+    private NumberTextInput _heightInput;
+
+    private Texture2D _gridCube;
+    private int _gridSize = 50;
+
+    private Vector2 _earthBlockCoordinates = new Vector2(float.NegativeInfinity, float.NegativeInfinity);
 
     private void _drawLevel(SpriteBatch spriteBatch)
     {
-        for (var i = 0; i < currentLevel.GameObjects.Count; i++)
+        for (var i = 0; i < _currentLevel.GameObjects.Count; i++)
         {
-            var gameObject = currentLevel.GameObjects[i];
+            var gameObject = _currentLevel.GameObjects[i];
             gameObject.Draw(spriteBatch);
 
             if (gameObject is IWeaponUser weaponUser)
@@ -144,37 +144,37 @@ public class LevelCreatorScene : Scene
                     weaponUser.GetCurrentWeapon().Draw(spriteBatch);
         }
 
-        for (var i = 0; i < currentLevel.Width; i += gridSize)
-            for (var j = 0; j < currentLevel.Height; j += gridSize)
-                spriteBatch.Draw(_gridCube, new Rectangle(i, j, gridSize, gridSize), Color.White);
+        for (var i = 0; i < _currentLevel.Width; i += _gridSize)
+            for (var j = 0; j < _currentLevel.Height; j += _gridSize)
+                spriteBatch.Draw(_gridCube, new Rectangle(i, j, _gridSize, _gridSize), Color.White);
 
-        if (earthBlockCoordinates.X != float.NegativeInfinity && earthBlockCoordinates.Y != float.NegativeInfinity)
+        if (_earthBlockCoordinates.X != float.NegativeInfinity && _earthBlockCoordinates.Y != float.NegativeInfinity)
         {
             var mouse = Mouse.GetState();
-            var mouseInMapCoordinates = camera.ConvertScreenPositionToMapPosition(new Vector2(mouse.X, mouse.Y));
+            var mouseInMapCoordinates = _camera.ConvertScreenPositionToMapPosition(new Vector2(mouse.X, mouse.Y));
 
-            for (var i = earthBlockCoordinates.X; i < mouseInMapCoordinates.X; i += gridSize)
-                for (var j = earthBlockCoordinates.Y; j < mouseInMapCoordinates.Y; j += gridSize)
-                    spriteBatch.Draw(EarthBlock.Sprite, new Rectangle((int)i, (int)j, gridSize, gridSize), Color.Gray);
+            for (var i = _earthBlockCoordinates.X; i < mouseInMapCoordinates.X; i += _gridSize)
+                for (var j = _earthBlockCoordinates.Y; j < mouseInMapCoordinates.Y; j += _gridSize)
+                    spriteBatch.Draw(EarthBlock.Sprite, new Rectangle((int)i, (int)j, _gridSize, _gridSize), Color.Gray);
         }
     }
 
     private void _moveCameraUpdate(KeyboardState keyboardState)
     {
-        if (control.IsKeyHold(keyboardState, Keys.A))
-            control.PressButton(Keys.A, () => cameraX -= 20);
+        if (_control.IsKeyHold(keyboardState, Keys.A))
+            _control.PressButton(Keys.A, () => _cameraX -= 20);
 
-        if (control.IsKeyHold(keyboardState, Keys.D))
-            control.PressButton(Keys.D, () => cameraX += 20);
+        if (_control.IsKeyHold(keyboardState, Keys.D))
+            _control.PressButton(Keys.D, () => _cameraX += 20);
 
-        if (control.IsKeyHold(keyboardState, Keys.W))
-            control.PressButton(Keys.W, () => cameraY -= 20);
+        if (_control.IsKeyHold(keyboardState, Keys.W))
+            _control.PressButton(Keys.W, () => _cameraY -= 20);
 
-        if (control.IsKeyHold(keyboardState, Keys.S))
-            control.PressButton(Keys.S, () => cameraY += 20);
+        if (_control.IsKeyHold(keyboardState, Keys.S))
+            _control.PressButton(Keys.S, () => _cameraY += 20);
 
-        cameraX = MathHelper.Clamp(cameraX, (Resolution.EtalonWidth / 2), currentLevel.Width - (Resolution.EtalonWidth / 2));
-        cameraY = MathHelper.Clamp(cameraY, (Resolution.EtalonHeight / 2), currentLevel.Height - (Resolution.EtalonHeight / 2));
+        _cameraX = MathHelper.Clamp(_cameraX, (Resolution.EtalonWidth / 2), _currentLevel.Width - (Resolution.EtalonWidth / 2));
+        _cameraY = MathHelper.Clamp(_cameraY, (Resolution.EtalonHeight / 2), _currentLevel.Height - (Resolution.EtalonHeight / 2));
     }
 
     private void _createAllWidgets()
@@ -182,45 +182,43 @@ public class LevelCreatorScene : Scene
         levelNames = _getAllLevelsNames();
         levelNames.Add("New level");
 
-        var levelChoose = new DropdownList(new Rectangle(0, 0, 200, 50),
-            dropdownMenuSprite,
-            dropdownMenuElementSprite,
-            standardFont,
+        var levelChoose = new DropdownList(
+            new Rectangle(0, 0, 200, 50),
             levelNames,
-            x => _changeLevel(x));
-        widgets.Add(levelChoose);
+            x => _changeLevel(x)
+            );
+
+        _widgets.Add(levelChoose);
 
         var allGameObjectsNames = typeof(LevelObjects).GetEnumNames();
-        var levelObjectChoose = new DropdownList(new Rectangle(200, 0, 200, 50),
-            dropdownMenuSprite,
-            dropdownMenuElementSprite,
-            standardFont,
+        var levelObjectChoose = new DropdownList(
+            new Rectangle(200, 0, 200, 50),
             allGameObjectsNames.ToList(),
-            x => currentGameObject = (LevelObjects)Enum.Parse(typeof(LevelObjects), allGameObjectsNames[x]));
-        widgets.Add(levelObjectChoose);
+            x => currentGameObject = (LevelObjects)Enum.Parse(typeof(LevelObjects), allGameObjectsNames[x])
+            );
+
+        _widgets.Add(levelObjectChoose);
 
         var allModesNames = typeof(Mode).GetEnumNames();
-        var modeChoose = new DropdownList(new Rectangle(400, 0, 200, 50),
-            dropdownMenuSprite,
-            dropdownMenuElementSprite,
-            standardFont,
+        var modeChoose = new DropdownList(
+            new Rectangle(400, 0, 200, 50),
             allModesNames.ToList(),
-            x => currentMode = (Mode)Enum.Parse(typeof(Mode), allModesNames[x]));
-        widgets.Add(modeChoose);
+            x => currentMode = (Mode)Enum.Parse(typeof(Mode), allModesNames[x])
+            );
 
-        widthInput = new NumberTextInput(new Rectangle(600, 0, 200, 50),
-            currentLevel.Width,
+        _widgets.Add(modeChoose);
+
+        _widthInput = new NumberTextInput(new Rectangle(600, 0, 200, 50),
+            _currentLevel.Width,
             5,
-            standardFont,
             _changeLevelWidth);
-        widgets.Add(widthInput);
+        _widgets.Add(_widthInput);
 
-        heightInput = new NumberTextInput(new Rectangle(800, 0, 200, 50),
-            currentLevel.Height,
+        _heightInput = new NumberTextInput(new Rectangle(800, 0, 200, 50),
+            _currentLevel.Height,
             5,
-            standardFont,
             _changeLevelHeight);
-        widgets.Add(heightInput);
+        _widgets.Add(_heightInput);
     }
 
     private List<string> _getAllLevelsNames()
@@ -239,7 +237,7 @@ public class LevelCreatorScene : Scene
 
     private void _changeLevel(int levelIndex)
     {
-        levelName = levelNames[levelIndex];
+        _levelName = levelNames[levelIndex];
         if (levelIndex == levelNames.Count - 1)
             _createNewLevel();
         else
@@ -248,58 +246,56 @@ public class LevelCreatorScene : Scene
 
     private void _createNewLevel()
     {
-        currentLevel = new Level(new List<GameObject>());
-        camera.SetNewMapSize(new System.Drawing.Size(currentLevel.Width, currentLevel.Height));
-        ChangeWidthInputValue(currentLevel.Width);
-        ChangeHeightInputValue(currentLevel.Height);
+        _currentLevel = new Level(new List<GameObject>());
+        _camera.SetNewMapSize(new System.Drawing.Size(_currentLevel.Width, _currentLevel.Height));
+        ChangeWidthInputValue(_currentLevel.Width);
+        ChangeHeightInputValue(_currentLevel.Height);
     }
 
     private void _changeExistingLevel(string levelName)
     {
-        currentLevel = Level.CreateLevelFromFile(levelName);
-        camera.SetNewMapSize(new System.Drawing.Size(currentLevel.Width, currentLevel.Height));
-        ChangeWidthInputValue(currentLevel.Width);
-        ChangeHeightInputValue(currentLevel.Height);
+        _currentLevel = Level.CreateLevelFromFile(levelName);
+        _camera.SetNewMapSize(new System.Drawing.Size(_currentLevel.Width, _currentLevel.Height));
+        ChangeWidthInputValue(_currentLevel.Width);
+        ChangeHeightInputValue(_currentLevel.Height);
     }
 
     private Vector2 _getGridCellIndex(int x, int y)
     {
-        return new Vector2(x / gridSize, y / gridSize);
+        return new Vector2(x / _gridSize, y / _gridSize);
     }
 
     private void _createModeAction(MouseState mouseState)
     {
-        var gridCell = _getGridCellIndex((int)(mouseState.X + cameraX - (Resolution.EtalonWidth / 2)), (int)(mouseState.Y + cameraY - (Resolution.EtalonHeight / 2)));
-        //if (FindCollisionObject(gridCell) != null)
-        //    return;
-        var coordinates = new Vector2(gridCell.X * gridSize, gridCell.Y * gridSize);
+        var gridCell = _getGridCellIndex((int)(mouseState.X + _cameraX - (Resolution.EtalonWidth / 2)), (int)(mouseState.Y + _cameraY - (Resolution.EtalonHeight / 2)));
+        var coordinates = new Vector2(gridCell.X * _gridSize, gridCell.Y * _gridSize);
         var coordinatesInStrings = new string[] { coordinates.X.ToString(), coordinates.Y.ToString() };
         var objectType = TypesUtils.GetTypeFromString(currentGameObject.ToString());
 
         if (currentGameObject == LevelObjects.EarthBlock)
         {
-            if (earthBlockCoordinates.X == float.NegativeInfinity && earthBlockCoordinates.Y == float.NegativeInfinity)
-                earthBlockCoordinates = new Vector2(coordinates.X, coordinates.Y); 
+            if (_earthBlockCoordinates.X == float.NegativeInfinity && _earthBlockCoordinates.Y == float.NegativeInfinity)
+                _earthBlockCoordinates = new Vector2(coordinates.X, coordinates.Y); 
             else
             {
-                var earthBlockGridCell = _getGridCellIndex((int)earthBlockCoordinates.X, (int)earthBlockCoordinates.Y);
+                var earthBlockGridCell = _getGridCellIndex((int)_earthBlockCoordinates.X, (int)_earthBlockCoordinates.Y);
                 if (gridCell.X >= earthBlockGridCell.X && gridCell.Y >= earthBlockGridCell.Y)
                 {
-                    var width = (gridCell.X - earthBlockGridCell.X) * gridSize + gridSize;
-                    var height = (gridCell.Y - earthBlockGridCell.Y) * gridSize + gridSize;
+                    var width = (gridCell.X - earthBlockGridCell.X) * _gridSize + _gridSize;
+                    var height = (gridCell.Y - earthBlockGridCell.Y) * _gridSize + _gridSize;
 
                     var blockCoordinates = new[] { 
-                        earthBlockCoordinates.X.ToString(),
-                        earthBlockCoordinates.Y.ToString(),
+                        _earthBlockCoordinates.X.ToString(),
+                        _earthBlockCoordinates.Y.ToString(),
                         width.ToString(),
                         height.ToString() 
                     };
 
                     var newGameObject = (GameObject)TypesUtils.CreateObject(typeof(EarthBlock), blockCoordinates);
-                    currentLevel.AddToGameObjects(newGameObject);
+                    _currentLevel.AddToGameObjects(newGameObject);
                 }
 
-                earthBlockCoordinates = new Vector2(float.NegativeInfinity, float.NegativeInfinity);   
+                _earthBlockCoordinates = new Vector2(float.NegativeInfinity, float.NegativeInfinity);   
             }
         }
         else
@@ -307,21 +303,21 @@ public class LevelCreatorScene : Scene
             if (currentGameObject == LevelObjects.Player && _checkIfPlayerAlreadyExists())
                 return;
             var newGameObject = (GameObject)TypesUtils.CreateObject(objectType, coordinatesInStrings);
-            currentLevel.AddToGameObjects(newGameObject);
+            _currentLevel.AddToGameObjects(newGameObject);
         }
     }
 
     private void _deleteModeAction(MouseState mouseState)
     {
-        var gridCell = _getGridCellIndex((int)(mouseState.X + cameraX - (Resolution.EtalonWidth / 2)), (int)(mouseState.Y + cameraY - (Resolution.EtalonHeight / 2)));
+        var gridCell = _getGridCellIndex((int)(mouseState.X + _cameraX - (Resolution.EtalonWidth / 2)), (int)(mouseState.Y + _cameraY - (Resolution.EtalonHeight / 2)));
         var collisionObject = _findCollisionObject(gridCell);
         if (collisionObject != null)
-            currentLevel.GameObjects.Remove(collisionObject);
+            _currentLevel.GameObjects.Remove(collisionObject);
     }
 
     private bool _checkIfPlayerAlreadyExists()
     {
-        foreach (var gameObject in currentLevel.GameObjects)
+        foreach (var gameObject in _currentLevel.GameObjects)
             if (gameObject is Player)
                 return true;
         return false;
@@ -329,9 +325,9 @@ public class LevelCreatorScene : Scene
 
     private GameObject _findCollisionObject(Vector2 gridCell)
     {
-        foreach (var gameObject in currentLevel.GameObjects)
-            if (gridCell.X * gridSize >= gameObject.X && gridCell.X * gridSize <= gameObject.X + gameObject.Width
-                && gridCell.Y * gridSize >= gameObject.Y && gridCell.Y * gridSize <= gameObject.Y + gameObject.Height)
+        foreach (var gameObject in _currentLevel.GameObjects)
+            if (gridCell.X * _gridSize >= gameObject.X && gridCell.X * _gridSize <= gameObject.X + gameObject.Width
+                && gridCell.Y * _gridSize >= gameObject.Y && gridCell.Y * _gridSize <= gameObject.Y + gameObject.Height)
                 return gameObject;
         return null;
     }
@@ -340,8 +336,8 @@ public class LevelCreatorScene : Scene
     {
         if (width >= Resolution.EtalonWidth)
         {
-            currentLevel.Width = width;
-            camera.SetNewMapSize(new System.Drawing.Size(width, currentLevel.Height));
+            _currentLevel.Width = width;
+            _camera.SetNewMapSize(new System.Drawing.Size(width, _currentLevel.Height));
             ChangeWidthInputValue(width);
         }
     }
@@ -350,19 +346,19 @@ public class LevelCreatorScene : Scene
     {
         if (height >= Resolution.EtalonHeight)
         {
-            currentLevel.Height = height;
-            camera.SetNewMapSize(new System.Drawing.Size(currentLevel.Width, height));
+            _currentLevel.Height = height;
+            _camera.SetNewMapSize(new System.Drawing.Size(_currentLevel.Width, height));
             ChangeHeightInputValue(height);
         }
     }
 
     private void ChangeWidthInputValue(int value)
     {
-        widthInput.SetValue(value);
+        _widthInput.SetValue(value);
     }
 
     private void ChangeHeightInputValue(int value)
     {
-        heightInput.SetValue(value);
+        _heightInput.SetValue(value);
     }
 }

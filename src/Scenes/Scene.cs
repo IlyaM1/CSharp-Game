@@ -16,4 +16,10 @@ public abstract class Scene
     public abstract void LoadContent(ContentManager content, GraphicsDevice graphics);
     public abstract void Update(GameTime gameTime);
     public abstract void Draw(SpriteBatch spriteBatch);
+
+    public void RunNewScene(Type sceneToRun)
+    {
+        IsDone = true;
+        SceneToRun = sceneToRun;
+    }
 }

@@ -9,13 +9,14 @@ namespace Dyhar.src.UI;
 
 public class NumberTextInput : Widget
 {
-    public NumberTextInput(Rectangle rectangle, int hintText, int maxLength, SpriteFont font, Action<int> whenLostFocus)
+    public static SpriteFont Font;
+
+    public NumberTextInput(Rectangle rectangle, int hintText, int maxLength, Action<int> whenLostFocus)
     {
         _rectangle = rectangle;
         _hintText = hintText.ToString();
         _text = hintText.ToString();
         _maxLength = maxLength;
-        _font = font;
         _lostFocus = whenLostFocus;
     }
 
@@ -25,12 +26,12 @@ public class NumberTextInput : Widget
         if (HasFocus())
             color = Color.Black;
 
-        spriteBatch.DrawString(_font, _text, _drawPosition, color);
+        spriteBatch.DrawString(Font, _text, _drawPosition, color);
         if (string.IsNullOrEmpty(_text))
-            spriteBatch.DrawString(_font, _hintText, _drawPosition, Color.Gray);
+            spriteBatch.DrawString(Font, _hintText, _drawPosition, Color.Gray);
     }
 
-    public override void Update(Camera camera, InputManager control, MouseState mouseState, KeyboardState keyboardState)
+    public override void UpdateEventHandler(Camera camera, InputManager control, MouseState mouseState, KeyboardState keyboardState)
     {
         _drawPosition = camera.ConvertScreenPositionToMapPosition(new Vector2(_rectangle.X, _rectangle.Y));
 
@@ -38,7 +39,7 @@ public class NumberTextInput : Widget
         {
             if (!_isInFocusContinuos)
                 _isInFocusContinuos = true;
-            // TODO: make cleaning from start if after focus
+
             foreach (var key in keyboardState.GetPressedKeys())
             {
                 if (control.IsKeyDown(keyboardState, key))
@@ -68,15 +69,8 @@ public class NumberTextInput : Widget
         }  
     }
 
-    private bool HasFocus()
-    {
-        return _rectangle.Contains(Mouse.GetState().Position);
-    }
-
-    public int GetValue()
-    {
-        return int.Parse(_text);
-    }
+    private bool HasFocus() => _rectangle.Contains(Mouse.GetState().Position);
+    public int GetValue() => int.Parse(_text);
 
     public void SetValue(int value)
     {
@@ -86,7 +80,6 @@ public class NumberTextInput : Widget
 
 
     private readonly string _hintText;
-    private readonly SpriteFont _font;
     private readonly Rectangle _rectangle;
     private readonly int _maxLength;
     private string _text = "0";

@@ -7,6 +7,6 @@ namespace Dyhar.src.UI;
 
 public abstract class Widget
 {
-    public abstract void Update(Camera camera, InputManager control, MouseState mouseState, KeyboardState keyboardState);
+    public abstract void UpdateEventHandler(Camera camera, InputManager control, MouseState mouseState, KeyboardState keyboardState);
     public abstract void Draw(SpriteBatch spriteBatch);
 }

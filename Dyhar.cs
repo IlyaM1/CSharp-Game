@@ -8,6 +8,8 @@ namespace Dyhar;
 
 public class Dyhar : Game
 {
+    public Scene CurrentScene { get; private set; }
+
     public static Dyhar GetInstance()
     {
         if (_dyharInstance == null)
@@ -29,18 +31,18 @@ public class Dyhar : Game
     protected override void LoadContent()
     {
         _spriteBatch = new SpriteBatch(GraphicsDevice);
-        _currentScene.LoadContent(Content, GraphicsDevice);
+        CurrentScene.LoadContent(Content, GraphicsDevice);
     }
 
     protected override void Update(GameTime gameTime)
     {
-        if (_currentScene.IsDone)
-            if (_currentScene.SceneToRun != null)
-                _runScene((Scene)Activator.CreateInstance(_currentScene.SceneToRun));
+        if (CurrentScene.IsDone)
+            if (CurrentScene.SceneToRun != null)
+                _runScene((Scene)Activator.CreateInstance(CurrentScene.SceneToRun));
             else
                 Exit();
         else
-            _currentScene.Update(gameTime);
+            CurrentScene.Update(gameTime);
 
         base.Update(gameTime);
     }
@@ -48,7 +50,7 @@ public class Dyhar : Game
     protected override void Draw(GameTime gameTime)
     {
         GraphicsDevice.Clear(Color.CornflowerBlue);
-        _currentScene.Draw(_spriteBatch);
+        CurrentScene.Draw(_spriteBatch);
         base.Draw(gameTime);
     }
 
@@ -56,20 +58,20 @@ public class Dyhar : Game
 
     private GraphicsDeviceManager _graphics;
     private SpriteBatch _spriteBatch;
-    private Scene _currentScene;
 
     private Dyhar()
     {
         Content.RootDirectory = "Content";
         IsMouseVisible = true;
 
+        CurrentScene = new MenuScene();
+
         _graphics = new GraphicsDeviceManager(this);
-        _currentScene = new MenuScene();
     }
 
     private void _runScene(Scene scene)
     {
-        _currentScene = scene;
+        CurrentScene = scene;
         scene.LoadContent(Content, GraphicsDevice);
     }
 }

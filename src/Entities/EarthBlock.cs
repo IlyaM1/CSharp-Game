@@ -13,42 +13,19 @@ public class EarthBlock : GameObject
     {
         X = x;
         Y = y;
-        this._width = width;
-        this._height = height;
+        _width = width;
+        _height = height;
 
         IsSolid = true;
     }
 
-    public override Texture2D GetSprite() => _ownSprite != null ? _ownSprite : Sprite;
+    public override Texture2D GetSprite() => Sprite;
 
     public override void Draw(SpriteBatch spriteBatch)
     {
-        if (_ownSprite == null)
-            _ownSprite = _getSpriteForThisSize(spriteBatch);
-
-        base.Draw(spriteBatch);
+        spriteBatch.Draw(Sprite, Rectangle, Color.White);
     }
 
     private int _width;
     private int _height;
-
-    private Texture2D _ownSprite;
-
-    private Texture2D _getSpriteForThisSize(SpriteBatch spriteBatch)
-    {
-        var stretchedTexture = new Texture2D(spriteBatch.GraphicsDevice, _width, _height);
-
-        var originalColors = new Color[Sprite.Width * Sprite.Height];
-        Sprite.GetData(originalColors);
-        var color = originalColors[0];
-
-        var stretchedColors = new Color[_width * _height];
-
-        for (int x = 0; x < _width; x++)
-            for (int y = 0; y < _height; y++)
-                stretchedColors[y * _width + x] = color;
-
-        stretchedTexture.SetData(stretchedColors);
-        return stretchedTexture;
-    }
 }
