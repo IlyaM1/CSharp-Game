@@ -20,8 +20,10 @@ public class Swordsman : Enemy, IWeaponUser
 
     public override void PlayerEnteredScreenEventHandler(Player player)
     {
-        if (BotStates.Wander == CurrentState && (Y >= player.Y - 40 && Y <= player.Y + 40))
+        if (CurrentState == BotStates.Wander && (Y >= player.Y - 40 && Y <= player.Y + 40))
             UpdateState(BotStates.Chase);
+        else if (CurrentState == BotStates.Idle)
+            UpdateState(BotStates.Wander);
 
         if (CurrentState == BotStates.Chase)
         {

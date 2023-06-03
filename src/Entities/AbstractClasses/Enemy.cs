@@ -51,5 +51,5 @@ public abstract class Enemy : MovingGameObject, IWarrior
     protected double MaxHealthPoints = 100.0;
     protected double CurrentHealthPoints;
     protected ulong LastAttackNumber = 0;
-    protected BotStates CurrentState = BotStates.Wander;
+    protected BotStates CurrentState = BotStates.Idle;
 }
